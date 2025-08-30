@@ -1,4 +1,4 @@
-# Emergent Fine-Structure Constant Calculation: 
+# Emergent Fine-Structure Constant Calculation — Biggest mystery unlocked 
 
 
 From the Pythagoreans’ hymn to numbers to Feynman’s “1/137” physics has long carried the suspicion that a single ratio ties disparate phenomena together. Sommerfeld introduced the fine-structure constant as a universal coupling , Eddington dared that it should be a pure number, Born framed it as the hidden governor of atomic detail, and Dirac argued that dimensionless combinations like $\alpha$ must be explained by structure rather than units . The riddle endured, acquiring almost mythic overtones—an Ariadne’s thread promised but never found.
