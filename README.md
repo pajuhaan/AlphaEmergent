@@ -94,3 +94,45 @@ C_log(α_em)        = 0.333333333333333333   (∆ vs 1/3 = -2.71498346735e-30)
 This work is based on the paper *Emergent Fine-Structure Constant from Relator Geometry* by M.Pajuhaan.
 
 Pajuhaan, M. (2025). Alpha. Zenodo. https://doi.org/10.5281/zenodo.16951008
+
+
+
+### 1. **[Rω = c — Emergence of Special and General Relativity](https://zenodo.org/records/16779813)**
+**Key Insight:**
+This paper introduces the **Relator principle** (Rω = c), which leads to the natural emergence of **Special Relativity** (SR) and **General Relativity** (GR) without invoking spacetime curvature. It shows how both **time dilation** and the **energy-momentum relation** come directly from quantum phase evolution, unifying quantum mechanics with relativity. 
+
+**Impact:**
+- Revolutionizes our understanding of SR and GR by deriving them from intrinsic quantum-phase dynamics.
+- Establishes quantum evolution as the foundation of spacetime behavior, bypassing traditional spacetime transformations.
+
+---
+
+### 2. **[Plato’s Quantum Cave — The WHY Behind Shared-Hamiltonian/Entanglement](https://zenodo.org/records/16779805)**
+**Key Insight:**
+Entanglement arises **geometrically** in the **Relator framework**, where internal and external frequencies ω_C and ω_R3 interact. This paper links **quantum entanglement** to internal quantum dynamics, resolving the **measurement problem** by removing the need for wavefunction collapse or hidden variables.
+
+**Impact:**
+- Provides a concrete, geometric foundation for understanding **entanglement**.
+- Explains the physical **origin of quantum nonlocality** via intrinsic relational frequencies.
+
+---
+
+### 3. **[Measurement as Quantum Bifurcation](https://zenodo.org/records/16779903)**
+**Key Insight:**
+Measurement in quantum mechanics is redefined as a **geometric bifurcation** within the Relator framework. The paper explains how quantum measurement does not collapse the wavefunction but causes a deterministic restructuring of the system’s relational geometry, which governs quantum **entanglement** and **locality**.
+
+**Impact:**
+- Resolves **quantum nonlocality** and **wavefunction collapse** ambiguities.
+- Provides a deterministic and **geometric explanation** for quantum measurement and entanglement, avoiding the pitfalls of traditional interpretations like Copenhagen.
+
+---
+
+### 4. **[g-factor Calculation Without QED](https://zenodo.org/records/16810381)**
+**Key Insight:**
+The **g-factor** of the electron is derived **analytically** in the Relator framework without **quantum electrodynamics (QED)**. The paper connects **relativistic time dilation** and **Coulomb interactions** to the observed value of the **g-factor** with high precision, predicting the value without the need for perturbative QED expansions.
+
+**Impact:**
+- Achieves **ppt precision** with the experimental g-factor using **geometric principles**.
+- Demonstrates a direct, **QED-independent** path to calculating the **g-factor**.
+
+---
