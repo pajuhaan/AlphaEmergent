@@ -32,7 +32,7 @@ This repository contains the code to compute the fine-structure constant $\alpha
 
 The method relies on a geometric and gauge-invariant construction that predicts $\alpha$ without any empirical inputs. It is based on a unique approach to coupling quantum electrodynamics and relativistic mechanics using Relator geometry.
 
-For more details, see the full paper: [Emergent Alpha](https://zenodo.org/records/16944533).
+For more details, see the full paper: [**Emergent Alpha**](https://zenodo.org/records/16944533).
 
 ## Features
 
@@ -91,4 +91,4 @@ C_log(α_em)        = 0.333333333333333333   (∆ vs 1/3 = -2.71498346735e-30)
 
 ## Credits
 
-This work is based on the paper *Emergent Fine-Structure Constant from Relator Geometry* by Mehrdad Pajuhaan.
+This work is based on the paper *Emergent Fine-Structure Constant from Relator Geometry* by M.Pajuhaan.
