@@ -92,3 +92,5 @@ C_log(α_em)        = 0.333333333333333333   (∆ vs 1/3 = -2.71498346735e-30)
 ## Credits
 
 This work is based on the paper *Emergent Fine-Structure Constant from Relator Geometry* by M.Pajuhaan.
+
+Pajuhaan, M. (2025). Alpha. Zenodo. https://doi.org/10.5281/zenodo.16951008
