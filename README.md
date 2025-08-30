@@ -32,7 +32,7 @@ This repository contains the code to compute the fine-structure constant $\alpha
 
 The method relies on a geometric and gauge-invariant construction that predicts $\alpha$ without any empirical inputs. It is based on a unique approach to coupling quantum electrodynamics and relativistic mechanics using Relator geometry.
 
-For more details, see the full paper: [**Emergent Alpha Paper**](https://zenodo.org/records/16944533).
+For more details, see the full paper: [**Alpha Paper**](https://zenodo.org/records/16944533).
 
 ## Features
 
