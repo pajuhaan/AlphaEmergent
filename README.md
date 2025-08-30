@@ -41,14 +41,11 @@ pip install mpmath numpy
 After installing the necessary libraries, you can run the code using:
 
 ```bash
-python AlphaEmergent.py
+python "Full Alpha Geometry Calculation.py"
 ```
 
 The script will compute the emergent $\alpha$ and output the results to the console.
 
-## Results
-
-This code computes the emergent value of the fine-structure constant and outputs it alongside the associated uncertainties. The precision achieved by this approach is comparable to the latest CODATA values.
 
 ### Example Output:
 
