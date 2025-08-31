@@ -13,7 +13,7 @@ $$
 
 so that the electromagnetic coupling is set by geometry alone. The construction yields rigid, dimensionless ratios between the Coulomb and $\Lambda$-channel sectors. These geometric invariants, not empirical inputs, pin down $\alpha$.
 
-The same mechanism unifies how "time" flows for quantum phases . In a companion analysis, the electron $g$-factor appears as an *evolution-rate shift* of the phase clock induced by the large-D functional on the matching shell—precisely analogous to time dilation in general relativity, whether momentum or gravity-induced, now for the Coulomb field predicted by the Relator  . Thus, the Relator framework does more than produce a number; it provides a single geometric origin for coupling and for evolution-rate renormalization, turning the century-old riddle of $\alpha$ into a calculable constant and opening a concrete path toward band-like stability structures for leptons within a background-free, gauge-invariant setting .
+The same mechanism unifies how "time" flows for quantum phases . In a companion analysis, the electron $g$-factor appears as an *evolution-rate shift* of the phase clock induced by the large-$\mathcal{D}$ functional on the matching shell—precisely analogous to time dilation in general relativity, whether momentum or gravity-induced, now for the Coulomb field predicted by the Relator  . Thus, the Relator framework does more than produce a number; it provides a single geometric origin for coupling and for evolution-rate renormalization, turning the century-old riddle of $\alpha$ into a calculable constant and opening a concrete path toward band-like stability structures for leptons within a background-free, gauge-invariant setting .
 
 Our closed pipeline predicts an emergent value:
 
