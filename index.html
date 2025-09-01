@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Emergent α — Relator (Closed, ladders ON)</title>
+<style>
+  :root{--bg:#0e0f12;--card:#151821;--ink:#e8ecf1;--muted:#9aa4b2;--accent:#6ae3ff;--ok:#86efac;--warn:#fbbf24;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
+  .card{width:min(1000px,96vw);background:var(--card);border-radius:20px;padding:28px;box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.02)}
+  .title{font-weight:700;font-size:18px;letter-spacing:.3px;color:var(--muted);margin-bottom:14px;display:flex;gap:10px;align-items:center}
+  .title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
+  .alpha{display:flex;align-items:center;justify-content:center;text-align:center;min-height:140px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.015),transparent);border:1px solid rgba(255,255,255,.06);margin-bottom:16px;padding:10px 16px}
+  .alpha .val{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:clamp(28px,8vw,56px);font-weight:800;letter-spacing:.5px}
+  .alpha .sub{margin-top:6px;color:var(--muted);font-size:14px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:10px}
+  .box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:14px}
+  .box h4{margin:.2rem 0 .6rem 0;font-size:13px;color:var(--muted);letter-spacing:.3px;font-weight:600}
+  .grid{display:grid;grid-template-columns:auto 1fr auto;gap:10px 12px;align-items:center}
+  label{color:var(--muted);font-size:13px}
+  input[type="number"]{width:120px;background:#0e1016;border:1px solid rgba(255,255,255,.08);color:var(--ink);border-radius:11px;padding:8px 10px;font:13px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .btn{appearance:none;border:0;background:linear-gradient(180deg,#78ffe6,#30b7ff);color:#041015;border-radius:14px;padding:12px 16px;font-weight:800;letter-spacing:.4px;cursor:pointer;transition:transform .06s ease}
+  .btn:hover{transform:translateY(-1px)} .btn:active{transform:translateY(1px)}
+  .controls{display:flex;align-items:center;gap:10px;justify-content:flex-end;margin-top:10px}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .log{white-space:pre-wrap;height:210px;overflow:auto;border-radius:12px;padding:12px;background:#0c0e14;border:1px solid rgba(255,255,255,.06);font-size:12px;color:#c9d4e3}
+  .muted{color:var(--muted)} .tag{display:inline-block;padding:3px 8px;border-radius:999px;background:#0f1320;border:1px solid rgba(255,255,255,.08);color:var(--muted);font-size:12px}
+  .pill{display:inline-block;padding:3px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:#0f1320;margin-right:6px;font-size:12px}
+  .links a{color:var(--accent);text-decoration:none} .links a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="title"><span class="dot"></span> Emergent α — Relator (closed root · ladders ON)</div>
+
+    <div class="alpha">
+      <div>
+        <div class="val" id="alphaVal">–––</div>
+        <div class="sub" id="alphaSub">waiting…</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="box">
+        <h4>Geometry & Spectrum (Path-I defaults)</h4>
+        <div class="grid">
+          <label>η = 1/π</label><span class="muted mono">fixed</span><span></span>
+          <label>ℓ = ε·η, ε = 1/√π</label><span class="muted mono">fixed</span><span></span>
+          <label>M<sub>max</sub> (L<sub>2m</sub>)</label><input type="number" id="Mmax" value="20" min="8" max="80" step="2"/>
+          <label>N<sub>max,L</sub> (sum)</label><input type="number" id="NmaxL" value="1200" min="200" max="20000" step="100"/>
+          <label>N<sub>max,K</sub> (sum)</label><input type="number" id="NmaxK" value="12000" min="1000" max="30000" step="1000"/>
+          <label>IR quadrature (N)</label><input type="number" id="Nint" value="3200" min="400" max="40000" step="200"/>
+          <label>Iter. limit</label><input type="number" id="iters" value="20" min="3" max="60"/>
+          <label>Tolerance (rel.)</label><input type="number" id="tol" value="5e-14" step="1e-14"/>
+        </div>
+        <div class="controls">
+          <span class="pill"><input type="checkbox" id="chiOn" checked/> χ-ladder</span>
+          <span class="pill"><input type="checkbox" id="selfOn" checked/> self-ladder</span>
+          <span class="pill"><input type="checkbox" id="outClosed" checked/> OUT: exact multipole</span>
+          <button class="btn" id="goBtn">Compute α</button>
+          <span class="tag" id="statusTag">idle</span>
+        </div>
+      </div>
+
+      <div class="box">
+        <h4>Diagnostics</h4>
+        <div class="log mono" id="log">Ready.</div>
+      </div>
+    </div>
+
+    <div class="box" style="margin-top:16px">
+      <h4>References & Related</h4>
+      <div class="links mono" style="font-size:13px;line-height:1.6">
+        Code (algorithm & outcomes): <a href="https://github.com/pajuhaan/AlphaEmergent" target="_blank">github.com/pajuhaan/AlphaEmergent</a><br/>
+        Manuscript (Emergent α): <a href="https://zenodo.org/records/17021330" target="_blank">zenodo.org/records/17021330</a><br/>
+        Rω = c — emergence of SR/GR: <a href="https://zenodo.org/records/16779813" target="_blank">zenodo.org/records/16779813</a><br/>
+        Plato’s Quantum Cave: <a href="https://zenodo.org/records/16779805" target="_blank">zenodo.org/records/16779805</a><br/>
+        Measurement as Quantum Bifurcation: <a href="https://zenodo.org/records/16779903" target="_blank">zenodo.org/records/16779903</a><br/>
+        Lepton g-factor without QED: <a href="https://zenodo.org/records/16810381" target="_blank">zenodo.org/records/16810381</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ================= constants (match Python) =================
+  const pi = Math.PI;
+  const C0_UNI   = (1/pi) * (4/3 + 1/(4*pi*pi));
+  const C0_GAUSS = 0.5*(Math.log(2) + 0.57721566490153286060); // ½(ln2+γ)
+  const LAMBDA_IND = Math.log(8*Math.sqrt(pi)) - 2.0;
+  const ITOT = 1/6 - 1/(4*pi*pi);
+  const ETA  = 1/pi;
+  const EPS  = 1/Math.sqrt(pi);
+  const ELL  = EPS * ETA;
+
+  // OUT: defaults identical to Python
+  const OUT_LMAX = 19;           // odd-only
+  const GL_OUT_NODES = 512;      // Gauss–Legendre nodes for OUT
+  const ELLIPTIC_GL_NODES = 96;  // Gauss–Legendre nodes for K(m), E(m)
+
+  // Spectrum tolerances (double precision friendly)
+  const SPEC_TOL = 1e-16;
+
+  // ================= UI refs =================
+  const alphaVal = document.getElementById('alphaVal');
+  const alphaSub = document.getElementById('alphaSub');
+  const logEl = document.getElementById('log');
+  const statusTag = document.getElementById('statusTag');
+  const chiOn  = document.getElementById('chiOn');
+  const selfOn = document.getElementById('selfOn');
+  const outClosed = document.getElementById('outClosed');
+
+  function log(s){ logEl.textContent += '\n' + s; logEl.scrollTop = logEl.scrollHeight; }
+  function resetLog(){ logEl.textContent = 'Ready.'; }
+
+  // ================= Gauss–Legendre (generic) =================
+  const GLCache = new Map();
+  function legendrePn(n, x){
+    // return {Pn, Pn1} = (P_n(x), P_{n-1}(x))
+    if(n===0) return {Pn:1, Pn1:1}; // P_-1 not used
+    let P0 = 1, P1 = x;
+    if(n===1) return {Pn:P1, Pn1:P0};
+    for(let k=2;k<=n;k++){
+      const Pk = ((2*k-1)*x*P1 - (k-1)*P0)/k;
+      P0 = P1; P1 = Pk;
+    }
+    return {Pn:P1, Pn1:P0};
+  }
+  function gaussLegendreNodes(n){
+    if(GLCache.has(n)) return GLCache.get(n);
+    const xs = new Float64Array(n);
+    const ws = new Float64Array(n);
+    const tol = 1e-15;
+    for(let k=1;k<=n;k++){
+      // good initial guess
+      let x = Math.cos(pi*(k-0.25)/(n+0.5));
+      for(let it=0; it<50; it++){
+        const {Pn, Pn1} = legendrePn(n, x);
+        const dPn = (n/(1 - x*x))*(Pn1 - x*Pn);
+        const dx = -Pn/dPn;
+        x += dx;
+        if(Math.abs(dx) < tol) break;
+      }
+      const {Pn, Pn1} = legendrePn(n, x);
+      const dPn = (n/(1 - x*x))*(Pn1 - x*Pn);
+      const w = 2/((1 - x*x)*dPn*dPn);
+      xs[k-1] = x; ws[k-1] = w;
+    }
+    const out = {xs, ws};
+    GLCache.set(n, out);
+    return out;
+  }
+
+  // ================= Complete elliptic integrals via GL =================
+  // K(m) = ∫_0^{π/2} dθ / √(1 - m sin^2 θ),  E(m) = ∫_0^{π/2} √(1 - m sin^2 θ) dθ
+  const EllGL = (function(){
+    const gl = gaussLegendreNodes(ELLIPTIC_GL_NODES);
+    const a = 0, b = 0.5*pi;
+    const scale = 0.5*(b-a);
+    const thetas = Array.from(gl.xs, xi => scale*xi + 0.5*(a+b));
+    const weights = Array.from(gl.ws, wi => wi*scale);
+    return {thetas, weights};
+  })();
+  function ellipticKE(m){
+    // clamp m to [0, 1 - eps]
+    let mm = m;
+    if(mm <= 0) return [0.5*pi, 0.5*pi]; // K(0)=E(0)=π/2
+    if(mm >= 1){ mm = 1 - 1e-16; }
+    let sK = 0, sE = 0;
+    const {thetas, weights} = EllGL;
+    for(let i=0;i<thetas.length;i++){
+      const th = thetas[i], w = weights[i];
+      const s = Math.sin(th), s2 = s*s;
+      const u = Math.sqrt(1 - mm*s2);
+      sK += w*(1/u);
+      sE += w*u;
+    }
+    return [sK, sE];
+  }
+
+  // ================= Magnetic ring field pieces (as in Python) =================
+  function B_rho(rho, z){
+    const rc2 = (1 + rho)*(1 + rho) + z*z;
+    const rc = Math.sqrt(rc2);
+    let k2 = 4*rho / rc2;
+    if(k2 <= 0) return 0;
+    if(k2 >= 1) k2 = 1 - 1e-16;
+    const denom = (1 - rho)*(1 - rho) + z*z;
+    if(rho === 0) return 0;
+    const [K, E] = ellipticKE(k2);
+    return (z / (2*pi*rho*rc)) * (-K + ((1 + rho*rho + z*z)/denom) * E);
+  }
+  function B_z(rho, z){
+    const rc2 = (1 + rho)*(1 + rho) + z*z;
+    const rc = Math.sqrt(rc2);
+    let k2 = 4*rho / rc2;
+    if(k2 <= 0) return 1/(2*rc*rc*rc);
+    if(k2 >= 1) k2 = 1 - 1e-16;
+    const [K, E] = ellipticKE(k2);
+    const denom = (1 - rho)*(1 - rho) + z*z;
+    return (1/(2*pi*rc)) * (K + ((1 - rho*rho - z*z)/denom) * E);
+  }
+  function Btheta_on_sphere_x(x, rstar){
+    const s = Math.sqrt(1 - x*x);
+    const rho = rstar * s;
+    const z   = rstar * x;
+    return B_rho(rho, z)*x - B_z(rho, z)*s;
+  }
+  function dPdx_leg(l, x){
+    if(l===0) return 0;
+    const {Pn, Pn1} = legendrePn(l, x);
+    return (l/(1 - x*x))*(Pn1 - x*Pn);
+  }
+
+  // ================= OUT exact multipole (with Richardson extrapolation) ======
+  function LambdaOUT_exact(eta, lmax=OUT_LMAX, glNodes=GL_OUT_NODES){
+    const rstar = 1/eta;
+    const {xs, ws} = gaussLegendreNodes(glNodes);
+    let Uout = 0;
+    const Lm = (lmax % 2 === 1) ? lmax : (lmax - 1);
+    for(let l=1; l<=Lm; l+=2){
+      const Il = l*(l+1)*2/(2*l+1);
+      let s = 0;
+      for(let i=0;i<xs.length;i++){
+        const x = xs[i], w = ws[i];
+        const Bt = Btheta_on_sphere_x(x, rstar);
+        const dP = dPdx_leg(l, x);
+        s += Bt * (-(1 - x*x) * dP) * w;
+      }
+      const a_l = - Math.pow(rstar, l+2) * s / Il;
+      Uout += ((l+1)/(2*l+1)) * (a_l*a_l) * Math.pow(rstar, -(2*l+1));
+    }
+    Uout *= (2*pi);
+    return -2*Uout;
+  }
+  function LambdaOUT_dipole(eta){
+    // coarse test mode (not used for final runs)
+    return -(pi/6)*Math.pow(eta,3);
+  }
+  function LambdaOUT_extrapolated(eta, lbase=OUT_LMAX, mode='exact'){
+    const Lb = (lbase % 2 === 1) ? lbase : (lbase - 1);
+    const F = (L)=> (mode==='exact' ? LambdaOUT_exact(eta, L, GL_OUT_NODES) : LambdaOUT_dipole(eta));
+    const S1 = F(Lb);
+    const S2 = F(Lb+2);
+    const S3 = F(Lb+4);
+    const denom = (S3 - 2*S2 + S1);
+    if(denom === 0 || Math.abs(denom) < 1e-30*Math.max(1,Math.abs(S3))) return S3;
+    const Sout = S1 - Math.pow(S2 - S1,2)/denom;
+    if(Math.abs(Sout) > 10*Math.max(Math.abs(S1),Math.abs(S2),Math.abs(S3))) return S3;
+    return Sout;
+  }
+
+  // ================= IR (TT–χ) kernel — Simpson over [0,1] ====================
+  function f_swirl(x, ell){ const t=1-x; return (t*t)/((t*t)+ell*ell); }
+  function PchiIR(ell, N){
+    let n = (N%2===0)? N : N-1;      // enforce even
+    const h = 1.0/n;
+    const w = x => (x*x)*Math.sin(pi*x)**2;
+    const g = x => w(x) * (1 - (1/3)*f_swirl(x, ell)) * Math.exp(-Math.pow((1-x)/ell, 2));
+    let s = g(0) + g(1);
+    for(let k=1;k<n;k++){ s += (k%2===0? 2:4)*g(k*h); }
+    return (s*h/3)/ITOT;
+  }
+
+  // ================= Spectrum K and L_{2m} (robust series) ====================
+  function In_m1(n){
+    const s1 = ((n-1)%2===0)? 1 : -1;
+    const s2 = (n%2===0)? 1 : -1;
+    return s1/(((n-1)*pi)**2) + s2/(((n+1)*pi)**2);
+  }
+  function series_K(Nmax, tol=SPEC_TOL){
+    let S = 0;
+    for(let n=2;n<=Nmax;n++){
+      const I = In_m1(n);
+      const t = ( (2*I)*(2*I) )/(n*n - 1);
+      S += t;
+      if(n>120 && Math.abs(t) < tol) break;
+    }
+    return (2/(pi*pi))*S;
+  }
+  function C_m_at_N(N, m){
+    // exact parity S0 for a = N*pi
+    const a = N*pi;
+    const S0 = (N%2===0)? 0 : (2.0/a);
+    if(m===0) return 0;
+    let Cprev=0, Sprev=S0;
+    for(let k=1;k<=m;k++){
+      const Ck = -(k/a)*Sprev;
+      const Sk = S0 + (k/a)*Cprev;
+      Cprev=Ck; Sprev=Sk;
+    }
+    return Cprev;
+  }
+  function I_nm(n, m2){
+    const C1 = C_m_at_N(n-1, m2);
+    const C2 = C_m_at_N(n+1, m2);
+    return 0.5*(C1 - C2);
+  }
+  function L_2m(m, Nmax, tol=SPEC_TOL){
+    let S = 0;
+    const m2 = 2*m;
+    for(let n=2;n<=Nmax;n++){
+      const I = I_nm(n, m2);
+      const t = ((2*I)*(2*I))/(n*n - 1);
+      S += t;
+      if(n>80 && Math.abs(t) < tol) break;
+    }
+    return (2/(pi*pi))*S;
+  }
+  function precomputeSpectrum(Mmax, NmaxL, NmaxK){
+    const t0 = performance.now();
+    const K = series_K(NmaxK, SPEC_TOL);
+    const L = [];
+    for(let m=2; m<=Mmax; m++){
+      L.push([m, L_2m(m, NmaxL, SPEC_TOL)]);
+    }
+    const t1=performance.now();
+    log(`Spectrum: K=${K.toPrecision(16)}, L_{2m} terms=${L.length}  [${((t1-t0)/1000).toFixed(2)} s]`);
+    return {K, L};
+  }
+
+  // ================= 𝓓_C(α), γ_geom, γ_eff =================
+  function DC_of_alpha(alpha, K, L_list){
+    const a = alpha;
+    const xi = 2*C0_UNI*a;
+    let D = (a/pi)*Math.sqrt(1 - xi) - (a/pi)*(xi/2)*K;
+    for(const [m, Lm] of L_list){
+      D -= (a/pi)*Math.pow(xi/2, m) * Lm;
+    }
+    return D;
+  }
+  function curvature_series_eta(eta, order){
+    let s=0, maxk=Math.floor(order/2);
+    for(let k=1;k<=maxk;k++){ s += Math.pow(eta,2*k)/factorial(2*k+1); }
+    return s;
+  }
+  function factorial(n){
+    let p=1; for(let i=2;i<=n;i++) p*=i; return p;
+  }
+  function gamma_geom(eta){ return 0.5*(1 + curvature_series_eta(eta, 12)); }
+  function gamma_eff(eta, K, DC, Pir){
+    return gamma_geom(eta) + (K/(2*DC))*C0_GAUSS*Pir;
+  }
+
+  // ================= 𝓖_ind and 𝓖_ind^ref (ε_Λ=0 for CLOSED) =================
+  const G_ind      = (Lambda,K)=> 1.5*K*Lambda*(1 + (K*Lambda)/(2*pi*pi));
+  const G_ind_ref  = (Lambda,K)=> G_ind(Lambda,K); // ε_Λ=0
+
+  // ================= Ladders (closed forms) ===================================
+  function deltaLambda_chi_ladder(eta, K, DC, Pir, dOUT){
+    const k = Math.sinh(eta)/eta - 1;
+    const x = (K/(2*DC))*C0_GAUSS*Pir;
+    return (-k * x*x / (1 + k*x)) * Pir * dOUT;
+  }
+  function deltaLambda_self_ladder(eta, K, Pir, Lambda_eff, alpha){
+    const ggeom = gamma_geom(eta);
+    const k = Math.sinh(eta)/eta - 1;
+    const ep = (alpha/pi) * (K/(2*pi*pi)) * Pir * Lambda_eff;
+    return - ggeom * Pir * Lambda_eff * (ep / (1 + k*ep));
+  }
+
+  // ================= bisection with auto-bracket =================
+  function solveAlphaForLambda(Lambda_eff, K, L_list, tolRel){
+    const G = G_ind_ref(Lambda_eff, K);
+    const F = (a)=> DC_of_alpha(a, K, L_list) - G;
+    let lo=0.002, hi=0.02, flo=F(lo), fhi=F(hi), expand=0;
+    while(flo*fhi>0 && expand<60){
+      lo/=1.7; hi*=1.7; if(lo<1e-5) lo=1e-5; if(hi>0.15) hi=0.15;
+      flo=F(lo); fhi=F(hi); expand++;
+    }
+    let mid=0.01;
+    for(let it=0; it<120; it++){
+      mid=(lo+hi)/2;
+      const fm=F(mid);
+      if(flo*fm<=0){ hi=mid; fhi=fm; } else { lo=mid; flo=fm; }
+      if(Math.abs(hi-lo) <= tolRel*Math.max(1,Math.abs(mid))) break;
+    }
+    return mid;
+  }
+
+  // ================= main compute =============================================
+  async function compute(){
+    const Mmax = parseInt(document.getElementById('Mmax').value,10);
+    const NmaxL= parseInt(document.getElementById('NmaxL').value,10);
+    const NmaxK= parseInt(document.getElementById('NmaxK').value,10);
+    const Nint = parseInt(document.getElementById('Nint').value,10);
+    const iters= parseInt(document.getElementById('iters').value,10);
+    const tolRel = parseFloat(document.getElementById('tol').value);
+
+    resetLog(); statusTag.textContent='computing…'; alphaVal.textContent='computing…'; alphaSub.textContent='running closed blocks…';
+    const t0=performance.now();
+
+    // spectrum
+    const {K, L} = precomputeSpectrum(Mmax, NmaxL, NmaxK);
+
+    // geometry
+    const Pir  = PchiIR(ELL, Nint);
+    const dUVIR= C0_GAUSS*Pir;
+    const dOUT = (outClosed.checked? LambdaOUT_extrapolated(ETA, OUT_LMAX, 'exact') : LambdaOUT_dipole(ETA));
+    const Lambda_base = LAMBDA_IND + dUVIR + dOUT;
+    log(`Geometry: Pχ=${Pir.toPrecision(16)}, ΔΛ_OUT=${dOUT.toPrecision(16)}, Λ_base=${Lambda_base.toPrecision(16)}`);
+
+    // fixed-point iteration on (Λ,α)
+    let Lambda_eff = Lambda_base;
+    let alpha_prev = null;
+
+    log(`[it]    α_k                𝓖_ref(Λ_k)          𝓓_C(α_k)          ∆Λ_sync               Λ_eff(k)`);
+    for(let it=1; it<=iters; it++){
+      const alpha_k = solveAlphaForLambda(Lambda_eff, K, L, tolRel);
+      const DC_k    = DC_of_alpha(alpha_k, K, L);
+
+      let DeltaLambda_sync = gamma_eff(ETA, K, DC_k, Pir) * Pir * dOUT;
+      if(chiOn.checked){  DeltaLambda_sync += deltaLambda_chi_ladder(ETA, K, DC_k, Pir, dOUT); }
+      if(selfOn.checked){ DeltaLambda_sync += deltaLambda_self_ladder(ETA, K, Pir, Lambda_eff, alpha_k); }
+      Lambda_eff = Lambda_base + DeltaLambda_sync;
+
+      log(`[${String(it).padStart(2,'0')}] ${alpha_k.toPrecision(16)}  ${G_ind_ref(Lambda_eff,K).toExponential(10)}  ${DC_k.toExponential(10)}  ${DeltaLambda_sync.toExponential(10)}  ${Lambda_eff.toExponential(10)}`);
+
+      if(alpha_prev!==null){
+        const rel = Math.abs(alpha_k - alpha_prev)/Math.max(1,Math.abs(alpha_k));
+        if(rel < tolRel*0.5){ alpha_prev=alpha_k; break; }
+      }
+      alpha_prev = alpha_k;
+    }
+
+    const alpha = solveAlphaForLambda(Lambda_eff, K, L, tolRel);
+    const t1=performance.now();
+
+    alphaVal.textContent = alpha.toPrecision(13);
+    alphaSub.textContent = `1/α = ${(1/alpha).toPrecision(13)}    •   ${((t1-t0)/1000).toFixed(2)} s`;
+    statusTag.textContent='done';
+  }
+
+  document.getElementById('goBtn').addEventListener('click', compute);
+  // autorun once
+  setTimeout(()=>document.getElementById('goBtn').click(), 300);
+})();
+</script>
+</body>
+</html>
