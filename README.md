@@ -1,6 +1,8 @@
 # Emergent Fine-Structure Constant Calculation
 
 
+ [Live Test](https://pajuhaan.github.io/AlphaEmergent/) (replicated HTML from the original Python code by LLM)
+
 From the Pythagoreans’ hymn to numbers to Feynman’s “1/137” physics has long carried the suspicion that a single ratio ties disparate phenomena together. Sommerfeld introduced the fine-structure constant as a universal coupling , Eddington dared that it should be a pure number, Born framed it as the hidden governor of atomic detail, and Dirac argued that dimensionless combinations like $\alpha$ must be explained by structure rather than units . The riddle endured, acquiring almost mythic overtones—an Ariadne’s thread promised but never found.
 
 In quantum physics, the fine-structure constant $\alpha$ appears almost everywhere, yet its origin remains arguably the field’s most stubborn mystery. After a century of attempts, no first-principles derivation has predicted its value even at the percent level; the rare multi-decimal matches have come from numerology or ad-hoc parameter tuning rather than a physical explanation.
