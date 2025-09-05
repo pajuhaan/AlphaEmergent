@@ -34,7 +34,7 @@ This repository contains the code to compute the fine-structure constant $\alpha
 
 The method relies on a geometric and gauge-invariant construction that predicts $\alpha$ without any empirical inputs. It is based on a unique approach to coupling quantum electrodynamics and relativistic mechanics using Relator geometry.
 
-For more details, see the full paper: [**Alpha Paper**](https://zenodo.org/records/16944533).
+For more details, see the full paper: [**Alpha Paper**](https://doi.org/10.5281/zenodo.17021330).
 
 ## Features
 
@@ -99,7 +99,7 @@ Pajuhaan, M. (2025). Alpha. Zenodo. https://doi.org/10.5281/zenodo.16951008
 
 
 
-### 1. **[Rω = c — Emergence of Special and General Relativity](https://zenodo.org/records/16779813)**
+### 1. **[Rω = c — Emergence of Special and General Relativity](https://doi.org/10.5281/zenodo.17013208)**
 **Key Insight:**
 This paper introduces the **Relator principle** (Rω = c), which leads to the natural emergence of **Special Relativity** (SR) and **General Relativity** (GR) without invoking spacetime curvature. It shows how both **time dilation** and the **energy-momentum relation** come directly from quantum phase evolution, unifying quantum mechanics with relativity. 
 
@@ -109,7 +109,7 @@ This paper introduces the **Relator principle** (Rω = c), which leads to the na
 
 ---
 
-### 2. **[Plato’s Quantum Cave — The WHY Behind Shared-Hamiltonian/Entanglement](https://zenodo.org/records/16779805)**
+### 2. **[Plato’s Quantum Cave — The WHY Behind Shared-Hamiltonian/Entanglement](https://doi.org/10.5281/zenodo.16779805)**
 **Key Insight:**
 Entanglement arises **geometrically** in the **Relator framework**, where internal and external frequencies ω_C and ω_R3 interact. This paper links **quantum entanglement** to internal quantum dynamics, resolving the **measurement problem** by removing the need for wavefunction collapse or hidden variables.
 
@@ -119,7 +119,7 @@ Entanglement arises **geometrically** in the **Relator framework**, where intern
 
 ---
 
-### 3. **[Measurement as Quantum Bifurcation](https://zenodo.org/records/16779903)**
+### 3. **[Measurement as Quantum Bifurcation](https://doi.org/10.5281/zenodo.16779903)**
 **Key Insight:**
 Measurement in quantum mechanics is redefined as a **geometric bifurcation** within the Relator framework. The paper explains how quantum measurement does not collapse the wavefunction but causes a deterministic restructuring of the system’s relational geometry, which governs quantum **entanglement** and **locality**.
 
@@ -129,7 +129,7 @@ Measurement in quantum mechanics is redefined as a **geometric bifurcation** wit
 
 ---
 
-### 4. **[g-factor Calculation Without QED](https://zenodo.org/records/16810381)**
+### 4. **[g-factor Calculation Without QED](https://doi.org/10.5281/zenodo.17021364)**
 **Key Insight:**
 The **g-factor** of the electron is derived **analytically** in the Relator framework without **quantum electrodynamics (QED)**. The paper connects **relativistic time dilation** and **Coulomb interactions** to the observed value of the **g-factor** with high precision, predicting the value without the need for perturbative QED expansions.
 
@@ -137,4 +137,3 @@ The **g-factor** of the electron is derived **analytically** in the Relator fram
 - Achieves **ppt precision** with the experimental g-factor using **geometric principles**.
 - Demonstrates a direct, **QED-independent** path to calculating the **g-factor**.
 
----
