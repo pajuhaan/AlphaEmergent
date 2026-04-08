@@ -388,7 +388,7 @@ window.MathJax = {
       <button id="mode-qed" class="mode-btn" type="button">Article + QED diagnostics</button>
       <span class="status-pill">Status: <strong id="status-label">Waiting…</strong></span>
       <span class="spacer"></span>
-      <a class="pill" href="https://doi.org/10.5281/zenodo.16944532" target="_blank" rel="noopener">Alpha paper</a>
+      <a class="pill" href="https://zenodo.org/records/17021330" target="_blank" rel="noopener">Alpha paper</a>
       <a class="pill" href="https://github.com/pajuhaan/AlphaEmergent" target="_blank" rel="noopener">Repository</a>
     </div>
     <div class="hero-note" id="hero-note"></div>
@@ -1339,7 +1339,7 @@ window.MathJax = {
     const qAlphaInv = opt ? fmt(opt.alphaQedRegressedInv, 17) : placeholder(mode);
     const qCloser = opt ? Math.abs(opt.deltaAlphaQedVsExp) < Math.abs(opt.deltaAlphaArticleVsExp) : false;
     const note = opt
-      ? `Diagnostic note: in this run, <span class="mono">|Δα<sub>QED,regressed</sub>| ${qCloser ? '&lt;' : '≥'} |Δα<sub>article</sub>|</span> versus <span class="math-inline">\(\alpha_{\exp}\)</span>. The QED-regressed branch is therefore ${qCloser ? 'benchmark-closer' : 'not benchmark-closer'} here, while <span class="math-inline">\(\alpha_{\mathrm{article}}\)</span> remains the primary geometric output.`
+      ? `Diagnostic note: in this run, <span class="mono">|Δα<sub>QED,regressed</sub>| ${qCloser ? '&lt;' : '≥'} |Δα<sub>article</sub>|</span> versus <span class="math-inline">\\(\\alpha_{\\exp}\\)</span>. The QED-regressed branch is therefore ${qCloser ? 'benchmark-closer' : 'not benchmark-closer'} here, while <span class="math-inline">\\(\\alpha_{\\mathrm{article}}\\)</span> remains the primary geometric output.`
       : `Only the main geometric output is active in this mode. The optional QED-regressed branch is intentionally suppressed and shown as <span class="mono">${placeholder(mode)}</span>.`;
 
     dom.keyPanel.innerHTML = `
@@ -1354,24 +1354,24 @@ window.MathJax = {
         <div class="key-card primary">
           <div class="kicker">Main geometric output</div>
           <div class="key-value">${fmt(result.outputs.alphaArticle, 17)}</div>
-          <div class="key-sub">\(\alpha_{\mathrm{article}}\) from \(\Lambda_{\mathrm{geom}} \rightarrow \mathrm{ALP} \rightarrow D_C^{\mathrm{lock}}\)</div>
-          <div class="key-sub">\(\alpha_{\mathrm{article}}^{-1} =\) <span class="mono">${fmt(result.outputs.alphaArticleInv, 17)}</span></div>
+          <div class="key-sub">\\(\\alpha_{\\mathrm{article}}\\) from \\(\\Lambda_{\\mathrm{geom}} \\rightarrow \\mathrm{ALP} \\rightarrow D_C^{\\mathrm{lock}}\\)</div>
+          <div class="key-sub">\\(\\alpha_{\\mathrm{article}}^{-1} =\\) <span class="mono">${fmt(result.outputs.alphaArticleInv, 17)}</span></div>
         </div>
         <div class="key-card primary">
           <div class="kicker">Optional diagnostic output</div>
           <div class="key-value">${qAlpha}</div>
-          <div class="key-sub">\(\alpha_{\mathrm{QED,regressed}}\) from solving \(D_C^{\mathrm{QED}}(\alpha)=D_C^{\mathrm{lock}}\)</div>
-          <div class="key-sub">\(\alpha_{\mathrm{QED,regressed}}^{-1} =\) <span class="mono">${qAlphaInv}</span></div>
+          <div class="key-sub">\\(\\alpha_{\\mathrm{QED,regressed}}\\) from solving \\(D_C^{\\mathrm{QED}}(\\alpha)=D_C^{\\mathrm{lock}}\\)</div>
+          <div class="key-sub">\\(\\alpha_{\\mathrm{QED,regressed}}^{-1} =\\) <span class="mono">${qAlphaInv}</span></div>
         </div>
         <div class="key-card">
           <div class="kicker">Independent lock input</div>
           <div class="key-value">${fmt(result.lock.lambdaGeom, 16)}</div>
-          <div class="key-sub">\(\Lambda_{\mathrm{geom}}\)</div>
+          <div class="key-sub">\\(\\Lambda_{\\mathrm{geom}}\\)</div>
         </div>
         <div class="key-card">
           <div class="kicker">ALP image</div>
           <div class="key-value">${fmt(result.lock.dLock, 16)}</div>
-          <div class="key-sub">\(D_C^{\mathrm{lock}}\)</div>
+          <div class="key-sub">\\(D_C^{\\mathrm{lock}}\\)</div>
         </div>
       </div>
       <div class="key-note">${note}</div>
@@ -1423,10 +1423,10 @@ window.MathJax = {
       </div>
     `;
     const rows = [
-      ['Independent vector input', '\(\Lambda_{\mathrm{geom}}\)', fmt(result.lock.lambdaGeom, 17)],
-      ['ALP bridge image', '\(D_C^{\mathrm{lock}}\)', fmt(result.lock.dLock, 17)],
-      ['Main geometric alpha', '\(\alpha_{\mathrm{article}}\)', fmt(result.outputs.alphaArticle, 17)],
-      ['Optional diagnostic alpha', '\(\alpha_{\mathrm{QED,regressed}}\)', qAlpha],
+      ['Independent vector input', '\\(\\Lambda_{\\mathrm{geom}}\\)', fmt(result.lock.lambdaGeom, 17)],
+      ['ALP bridge image', '\\(D_C^{\\mathrm{lock}}\\)', fmt(result.lock.dLock, 17)],
+      ['Main geometric alpha', '\\(\\alpha_{\\mathrm{article}}\\)', fmt(result.outputs.alphaArticle, 17)],
+      ['Optional diagnostic alpha', '\\(\\alpha_{\\mathrm{QED,regressed}}\\)', qAlpha],
     ];
     dom.sections.flow.innerHTML =
       sectionHeader('Workflow at a glance', 'The calculation is exposed as a minimal step-by-step path so the dependency structure is visible immediately.', 'Computation path') +
@@ -1446,15 +1446,15 @@ window.MathJax = {
       </div>
     `;
     const rows = [
-      ['\(\eta_0\)', fmt(result.constants.ETA_0, 17), 'Minimal branch ratio'],
-      ['\(\ell_0\)', fmt(result.constants.ELL_0, 17), 'Minimal shell width'],
-      ['\(\Lambda_{\mathrm{ind}}\)', fmt(result.constants.LAMBDA_IND, 17), 'Filamentary reference core'],
-      ['\(C_{\mathrm{UV}}^{\mathrm{Gauss}}\)', fmt(result.constants.C_UV_GAUSS, 17), 'Gaussian UV constant'],
-      ['\(K\)', fmt(result.constants.KGEOM, 17), 'Exact ALP shell constant'],
-      ['\(\alpha_{\exp}^{-1}\)', fmtOptional(opt ? opt.alphaInvExp : null, mode, 17), 'External benchmark only'],
-      ['\(\sigma(\alpha^{-1})\)', fmtOptional(opt ? opt.alphaInvExpSigma : null, mode, 8, true), 'External uncertainty only'],
-      ['\(\alpha_{\exp}\)', fmtOptional(opt ? opt.alphaExp : null, mode, 17), 'External benchmark only'],
-      ['\(\sigma(\alpha)\)', fmtOptional(opt ? opt.alphaExpSigma : null, mode, 8, true), 'Propagated external uncertainty'],
+      ['\\(\\eta_0\\)', fmt(result.constants.ETA_0, 17), 'Minimal branch ratio'],
+      ['\\(\\ell_0\\)', fmt(result.constants.ELL_0, 17), 'Minimal shell width'],
+      ['\\(\\Lambda_{\\mathrm{ind}}\\)', fmt(result.constants.LAMBDA_IND, 17), 'Filamentary reference core'],
+      ['\\(C_{\\mathrm{UV}}^{\\mathrm{Gauss}}\\)', fmt(result.constants.C_UV_GAUSS, 17), 'Gaussian UV constant'],
+      ['\\(K\\)', fmt(result.constants.KGEOM, 17), 'Exact ALP shell constant'],
+      ['\\(\\alpha_{\\exp}^{-1}\\)', fmtOptional(opt ? opt.alphaInvExp : null, mode, 17), 'External benchmark only'],
+      ['\\(\\sigma(\\alpha^{-1})\\)', fmtOptional(opt ? opt.alphaInvExpSigma : null, mode, 8, true), 'External uncertainty only'],
+      ['\\(\\alpha_{\\exp}\\)', fmtOptional(opt ? opt.alphaExp : null, mode, 17), 'External benchmark only'],
+      ['\\(\\sigma(\\alpha)\\)', fmtOptional(opt ? opt.alphaExpSigma : null, mode, 8, true), 'Propagated external uncertainty'],
     ];
     dom.sections.constants.innerHTML =
       sectionHeader('Exact constants and optional external benchmark inputs', 'The theorem-path constants are always shown numerically. Experimental α and σ are shown only when the diagnostic mode is active.', 'Constants') +
@@ -1465,16 +1465,16 @@ window.MathJax = {
   function renderVectorSection(result){
     const rep = result.articleVector;
     const rows = [
-      ['\(P_{\mathrm{IR}}^{(\mathrm{mean})}(\ell_0)\)', fmt(rep.pIrMean, 17), 'Derived from \(\Lambda_{\mathrm{UV\to IR}}^{(\mathrm{mean})}/C_{\mathrm{UV}}^{\mathrm{Gauss}}\).'],
-      ['\(\Lambda_{\mathrm{UV\to IR}}^{(\mathrm{mean})}(\ell_0)\)', fmt(rep.lambdaUvToIrMean, 17), 'Article mean-shell representative used in the independent lock.'],
-      ['\(\Lambda_{\mathrm{OUT}}(\eta_0)\)', fmt(rep.lambdaOutArticle, 17), 'Article shell-source representative.'],
-      ['\(R_{\chi}^{(\mathrm{mean})}\)', fmt(rep.rChiMean, 17), 'Recovered from \([\Lambda_{\mathrm{OUT}}R_\chi]/\Lambda_{\mathrm{OUT}}\).'],
-      ['\(\Lambda_{\mathrm{OUT}}(\eta_0)R_{\chi}^{(\mathrm{mean})}\)', fmt(rep.exteriorMemoryTotalMean, 17), 'Representative exterior-memory contribution.'],
-      ['\(\Lambda_{\mathrm{geom}}\)', fmt(rep.lambdaGeomMean, 17), 'Independent geometric lock input.'],
-      ['Article weight \(w_1\)', fmt(rep.sourceWeightsArticle[1], 17), 'Representative odd-mode weight.'],
-      ['Article weight \(w_3\)', fmt(rep.sourceWeightsArticle[3], 17), 'Representative odd-mode weight.'],
-      ['Article weight \(w_5\)', fmt(rep.sourceWeightsArticle[5], 17), 'Representative odd-mode weight.'],
-      ['Article weight \(w_7\)', fmt(rep.sourceWeightsArticle[7], 17), 'Representative odd-mode weight.'],
+      ['\\(P_{\\mathrm{IR}}^{(\\mathrm{mean})}(\\ell_0)\\)', fmt(rep.pIrMean, 17), 'Derived from \\(\\Lambda_{\\mathrm{UV\\to IR}}^{(\\mathrm{mean})}/C_{\\mathrm{UV}}^{\\mathrm{Gauss}}\\).'],
+      ['\\(\\Lambda_{\\mathrm{UV\\to IR}}^{(\\mathrm{mean})}(\\ell_0)\\)', fmt(rep.lambdaUvToIrMean, 17), 'Article mean-shell representative used in the independent lock.'],
+      ['\\(\\Lambda_{\\mathrm{OUT}}(\\eta_0)\\)', fmt(rep.lambdaOutArticle, 17), 'Article shell-source representative.'],
+      ['\\(R_{\\chi}^{(\\mathrm{mean})}\\)', fmt(rep.rChiMean, 17), 'Recovered from \\([\\Lambda_{\\mathrm{OUT}}R_\\chi]/\\Lambda_{\\mathrm{OUT}}\\).'],
+      ['\\(\\Lambda_{\\mathrm{OUT}}(\\eta_0)R_{\\chi}^{(\\mathrm{mean})}\\)', fmt(rep.exteriorMemoryTotalMean, 17), 'Representative exterior-memory contribution.'],
+      ['\\(\\Lambda_{\\mathrm{geom}}\\)', fmt(rep.lambdaGeomMean, 17), 'Independent geometric lock input.'],
+      ['Article weight \\(w_1\\)', fmt(rep.sourceWeightsArticle[1], 17), 'Representative odd-mode weight.'],
+      ['Article weight \\(w_3\\)', fmt(rep.sourceWeightsArticle[3], 17), 'Representative odd-mode weight.'],
+      ['Article weight \\(w_5\\)', fmt(rep.sourceWeightsArticle[5], 17), 'Representative odd-mode weight.'],
+      ['Article weight \\(w_7\\)', fmt(rep.sourceWeightsArticle[7], 17), 'Representative odd-mode weight.'],
     ];
     const formulas = `
       <div class="formula-grid">
@@ -1497,9 +1497,9 @@ window.MathJax = {
       fmt(raw.jchi[j], 17),
       fmt(raw.weights[j], 17),
     ]);
-    rows.push(['Cumulative through \(j=7\)', '—', '—', fmt(cumulative, 17)]);
-    rows.push(['Tail above \(j=7\)', '—', '—', fmt(1 - cumulative, 17)]);
-    rows.push(['\(\Lambda_{\mathrm{OUT}}^{\mathrm{raw}}(\eta_0)\)', fmt(raw.lambdaOut, 17), '', 'Informative raw Maxwell audit only']);
+    rows.push(['Cumulative through \\(j=7\\)', '—', '—', fmt(cumulative, 17)]);
+    rows.push(['Tail above \\(j=7\\)', '—', '—', fmt(1 - cumulative, 17)]);
+    rows.push(['\\(\\Lambda_{\\mathrm{OUT}}^{\\mathrm{raw}}(\\eta_0)\\)', fmt(raw.lambdaOut, 17), '', 'Informative raw Maxwell audit only']);
     const formulas = `
       <div class="formula-grid">
         ${formulaCard('Shell projection', String.raw`a_j^{(\mathrm{sh})}(\eta_0) = \frac{\int_{-1}^{1}\widetilde B_\theta(v)\sqrt{1-v^2}\,P'_j(v)\,dv}{I_j}`, null, 'Direct numerical projection of the shell field.')}
@@ -1509,7 +1509,7 @@ window.MathJax = {
     dom.sections.rawShell.innerHTML =
       sectionHeader('Direct Maxwell shell audit', 'The raw shell evaluation is still printed for transparency, but it is not what drives the browser lock unless the representative block is changed on purpose.', 'Audit branch') +
       formulas +
-      tableHTML(['Mode / diagnostic', '\(a_j^{(sh)}\)', '\(J_j^{(\chi)}\)', 'Weight / note'], rows, [1,2,3]);
+      tableHTML(['Mode / diagnostic', '\\(a_j^{(sh)}\\)', '\\(J_j^{(\\chi)}\\)', 'Weight / note'], rows, [1,2,3]);
   }
 
   function renderScalarSection(result){
@@ -1521,14 +1521,14 @@ window.MathJax = {
       <div class="formula-grid">
         ${formulaCard('Closed mode kernel', String.raw`C_{mn} = mn\left(F_{|m-n|}+F_{m+n}\right)`, null, 'Used in the higher-mode sums.')}
         ${formulaCard('Mother radicand', String.raw`\mathcal R_{\mathrm{moth}}(D) = 1 - \Theta_1 D + D^2 G(D)`, null, 'The scalar branch is solved through this radicand.')}
-        ${formulaCard('Current scalar equation', String.raw`D_C = x\sqrt{\mathcal R_{\mathrm{moth}}(D_C)},\qquad x = \frac{\alpha}{\pi}`, null, 'Defines the current and refined \(D_C(\alpha)\) branches.')}
+        ${formulaCard('Current scalar equation', String.raw`D_C = x\sqrt{\mathcal R_{\mathrm{moth}}(D_C)},\qquad x = \frac{\alpha}{\pi}`, null, 'Defines the current and refined \\(D_C(\\alpha)\\) branches.')}
         ${formulaCard('Refined linear load', String.raw`\Theta_1^{(\mathrm{refined})} = \Theta_1^{(\mathrm{core})} + B_{11}^{(3,\rho)}`, fmt(result.refinedScenario.theta1Total, 17))}
       </div>
     `;
     dom.sections.scalar.innerHTML =
       sectionHeader('Scalar channel: current and refined evaluators', 'Both scalar branches are shown explicitly because the lock is read out on the current article branch while the refined branch remains useful for ledger and closure checks.', 'Scalar branch') +
       formulas +
-      tableHTML(['Model', '\(\Theta_1\)', '\(A_{uv}\)', '\(A_{ir}\)', '\(\chi_{cross}\)', 'Kernel scale'], rows, [1,2,3,4,5]);
+      tableHTML(['Model', '\\(\\Theta_1\\)', '\\(A_{uv}\\)', '\\(A_{ir}\\)', '\\(\\chi_{cross}\\)', 'Kernel scale'], rows, [1,2,3,4,5]);
   }
 
   function renderLockSection(result){
@@ -1541,12 +1541,12 @@ window.MathJax = {
       </div>
     `;
     const rows = [
-      ['\(\Lambda_{\mathrm{geom}}\)', fmt(result.lock.lambdaGeom, 17), 'Independent vector-shell representative fed into ALP.'],
-      ['\(\zeta_{\mathrm{lock}}\)', fmt(result.lock.zetaLock, 17), 'Linear bridge variable.'],
-      ['\(D_C^{\mathrm{lock}}\)', fmt(result.lock.dLock, 17), 'Geometric lock in the scalar channel.'],
-      ['\(\alpha_{\mathrm{article}}\)', fmt(result.outputs.alphaArticle, 17), 'Main geometric output.'],
-      ['\(g_{e,2}^{\mathrm{article}}\)', fmt(result.outputs.g2Article, 17), 'Calculated from \(D_{\mathrm{total}}\).'],
-      ['\(a_e^{\mathrm{article}}\)', fmt(result.outputs.aEArticle, 17), 'Equal to \(g_{e,2}-1\).'],
+      ['\\(\\Lambda_{\\mathrm{geom}}\\)', fmt(result.lock.lambdaGeom, 17), 'Independent vector-shell representative fed into ALP.'],
+      ['\\(\\zeta_{\\mathrm{lock}}\\)', fmt(result.lock.zetaLock, 17), 'Linear bridge variable.'],
+      ['\\(D_C^{\\mathrm{lock}}\\)', fmt(result.lock.dLock, 17), 'Geometric lock in the scalar channel.'],
+      ['\\(\\alpha_{\\mathrm{article}}\\)', fmt(result.outputs.alphaArticle, 17), 'Main geometric output.'],
+      ['\\(g_{e,2}^{\\mathrm{article}}\\)', fmt(result.outputs.g2Article, 17), 'Calculated from \\(D_{\\mathrm{total}}\\).'],
+      ['\\(a_e^{\\mathrm{article}}\\)', fmt(result.outputs.aEArticle, 17), 'Equal to \\(g_{e,2}-1\\).'],
     ];
     dom.sections.lock.innerHTML =
       sectionHeader('Independent lock and ALP map', 'This section isolates the exact place where the independent vector representative enters the scalar channel and becomes the locked geometric input for the emergent alpha computation.', 'Main branch') +
@@ -1558,9 +1558,9 @@ window.MathJax = {
     const opt = result.optional;
     const mode = result.mode;
     const rows = [
-      ['\(\alpha_{\mathrm{article}}\)', fmt(result.outputs.alphaArticle, 17), fmt(result.outputs.alphaArticleInv, 17), fmtOptional(opt ? opt.deltaAlphaArticleVsExp : null, mode, 11, true), fmtOptional(opt ? opt.zSigmaArticle : null, mode, 11)],
-      ['\(\alpha_{\mathrm{QED,regressed}}\)', fmtOptional(opt ? opt.alphaQedRegressed : null, mode, 17), fmtOptional(opt ? opt.alphaQedRegressedInv : null, mode, 17), fmtOptional(opt ? opt.deltaAlphaQedVsExp : null, mode, 11, true), fmtOptional(opt ? opt.zSigmaQed : null, mode, 11)],
-      ['\(\alpha_{\mathrm{QED,regressed}}-\alpha_{\mathrm{article}}\)', fmtOptional(opt ? opt.deltaAlphaQedVsArticle : null, mode, 11, true), placeholder(mode), placeholder(mode), 'Diagnostic separation only'],
+      ['\\(\\alpha_{\\mathrm{article}}\\)', fmt(result.outputs.alphaArticle, 17), fmt(result.outputs.alphaArticleInv, 17), fmtOptional(opt ? opt.deltaAlphaArticleVsExp : null, mode, 11, true), fmtOptional(opt ? opt.zSigmaArticle : null, mode, 11)],
+      ['\\(\\alpha_{\\mathrm{QED,regressed}}\\)', fmtOptional(opt ? opt.alphaQedRegressed : null, mode, 17), fmtOptional(opt ? opt.alphaQedRegressedInv : null, mode, 17), fmtOptional(opt ? opt.deltaAlphaQedVsExp : null, mode, 11, true), fmtOptional(opt ? opt.zSigmaQed : null, mode, 11)],
+      ['\\(\\alpha_{\\mathrm{QED,regressed}}-\\alpha_{\\mathrm{article}}\\)', fmtOptional(opt ? opt.deltaAlphaQedVsArticle : null, mode, 11, true), placeholder(mode), placeholder(mode), 'Diagnostic separation only'],
     ];
     const formulas = `
       <div class="formula-grid">
@@ -1571,16 +1571,16 @@ window.MathJax = {
     dom.sections.alpha.innerHTML =
       sectionHeader('Final alpha outputs and optional benchmark deltas', 'The article alpha is always present. The QED-regressed alpha and all benchmark deltas appear only when the external comparison mode is active.', 'Outputs') +
       formulas +
-      tableHTML(['Quantity', 'Value', 'Inverse', 'Δ vs \(\alpha_{\exp}\)', 'zσ / note'], rows, [1,2,3,4]);
+      tableHTML(['Quantity', 'Value', 'Inverse', 'Δ vs \\(\\alpha_{\\exp}\\)', 'zσ / note'], rows, [1,2,3,4]);
   }
 
   function renderG2Section(result){
     const opt = result.optional;
     const mode = result.mode;
     const rows = [
-      ['Article branch at \(\alpha_{\mathrm{article}}\)', fmt(result.outputs.g2Article, 17), fmt(result.outputs.aEArticle, 17), fmt(dTotalFromDAndAlpha(result.lock.dLock, result.outputs.alphaArticle), 17)],
-      ['Pure-QED shock at \(\alpha_{\exp}\)', fmtOptional(opt ? opt.g2QedAtAlphaExp : null, mode, 17), fmtOptional(opt ? opt.aEqedAtAlphaExp : null, mode, 17), fmtOptional(opt ? opt.dTotalQedAtAlphaExp : null, mode, 17)],
-      ['Pure-QED shock at \(\alpha_{\mathrm{QED,regressed}}\)', fmtOptional(opt ? opt.g2QedAtRegressedAlpha : null, mode, 17), fmtOptional(opt ? opt.aEqedAtRegressedAlpha : null, mode, 17), fmtOptional(opt ? opt.dTotalQedAtRegressedAlpha : null, mode, 17)],
+      ['Article branch at \\(\\alpha_{\\mathrm{article}}\\)', fmt(result.outputs.g2Article, 17), fmt(result.outputs.aEArticle, 17), fmt(dTotalFromDAndAlpha(result.lock.dLock, result.outputs.alphaArticle), 17)],
+      ['Pure-QED shock at \\(\\alpha_{\\exp}\\)', fmtOptional(opt ? opt.g2QedAtAlphaExp : null, mode, 17), fmtOptional(opt ? opt.aEqedAtAlphaExp : null, mode, 17), fmtOptional(opt ? opt.dTotalQedAtAlphaExp : null, mode, 17)],
+      ['Pure-QED shock at \\(\\alpha_{\\mathrm{QED,regressed}}\\)', fmtOptional(opt ? opt.g2QedAtRegressedAlpha : null, mode, 17), fmtOptional(opt ? opt.aEqedAtRegressedAlpha : null, mode, 17), fmtOptional(opt ? opt.dTotalQedAtRegressedAlpha : null, mode, 17)],
     ];
     const formulas = `
       <div class="formula-grid">
@@ -1591,9 +1591,9 @@ window.MathJax = {
       </div>
     `;
     dom.sections.g2.innerHTML =
-      sectionHeader('Calculated \(g_2\), \(a_e\), and total correction', 'This isolates the physically read-out quantities from the locked geometric branch and compares them, when enabled, to the external pure-QED shock chain.', 'Physical read-out') +
+      sectionHeader('Calculated \\(g_2\\), \\(a_e\\), and total correction', 'This isolates the physically read-out quantities from the locked geometric branch and compares them, when enabled, to the external pure-QED shock chain.', 'Physical read-out') +
       formulas +
-      tableHTML(['Model', '\(g_2\)', '\(a_e\)', '\(D_{\mathrm{total}}\)'], rows, [1,2,3]);
+      tableHTML(['Model', '\\(g_2\\)', '\\(a_e\\)', '\\(D_{\\mathrm{total}}\\)'], rows, [1,2,3]);
   }
 
   function coefficientRows(dSeries, dTotalSeries, g2Series, aSeries, opt, mode){
@@ -1622,9 +1622,9 @@ window.MathJax = {
       </div>
     `;
     dom.sections.currentLedger.innerHTML =
-      sectionHeader('Current article rank-5 coefficient ledger', 'The current article branch coefficients are shown term by term so the construction of \(D_C\), \(D_{\mathrm{total}}\), \(g_2\), and \(a_e\) is visible numerically.', 'Ledger') +
+      sectionHeader('Current article rank-5 coefficient ledger', 'The current article branch coefficients are shown term by term so the construction of \\(D_C\\), \\(D_{\\mathrm{total}}\\), \\(g_2\\), and \\(a_e\\) is visible numerically.', 'Ledger') +
       formulas +
-      tableHTML(['n', '\(D_C\) coeff', '\(D_{\mathrm{total}}\) coeff', '\(g_2\) coeff', '\(a_e\) coeff', 'pure-QED \(a_e\)', 'Δ\(a_e\)'], coefficientRows(result.series.currentDSeries, result.series.currentDTotalSeries, result.series.currentG2Series, result.series.currentASeries, result.optional, result.mode), [1,2,3,4,5,6]);
+      tableHTML(['n', '\\(D_C\\) coeff', '\\(D_{\\mathrm{total}}\\) coeff', '\\(g_2\\) coeff', '\\(a_e\\) coeff', 'pure-QED \\(a_e\\)', 'Δ\\(a_e\\)'], coefficientRows(result.series.currentDSeries, result.series.currentDTotalSeries, result.series.currentG2Series, result.series.currentASeries, result.optional, result.mode), [1,2,3,4,5,6]);
   }
 
   function renderRefinedLedgerSection(result){
@@ -1637,7 +1637,7 @@ window.MathJax = {
     dom.sections.refinedLedger.innerHTML =
       sectionHeader('Refined rank-100 coefficient ledger', 'This table carries the same coefficient structure as the current branch, but for the refined no-free-parameter evaluator.', 'Ledger') +
       formulas +
-      tableHTML(['n', '\(D_C\) coeff', '\(D_{\mathrm{total}}\) coeff', '\(g_2\) coeff', '\(a_e\) coeff', 'pure-QED \(a_e\)', 'Δ\(a_e\)'], coefficientRows(result.series.refinedDSeries, result.series.refinedDTotalSeries, result.series.refinedG2Series, result.series.refinedASeries, result.optional, result.mode), [1,2,3,4,5,6]);
+      tableHTML(['n', '\\(D_C\\) coeff', '\\(D_{\\mathrm{total}}\\) coeff', '\\(g_2\\) coeff', '\\(a_e\\) coeff', 'pure-QED \\(a_e\\)', 'Δ\\(a_e\\)'], coefficientRows(result.series.refinedDSeries, result.series.refinedDTotalSeries, result.series.refinedG2Series, result.series.refinedASeries, result.optional, result.mode), [1,2,3,4,5,6]);
   }
 
   function renderQedSeriesSection(result){
@@ -1659,9 +1659,9 @@ window.MathJax = {
       </div>
     `;
     dom.sections.qedSeries.innerHTML =
-      sectionHeader('Optional QED regression ledger', 'The QED coefficient and regressed \(D_C^{\mathrm{QED}}\) series are shown only as an optional diagnostic branch. They never modify the independent lock.', 'Diagnostic branch') +
+      sectionHeader('Optional QED regression ledger', 'The QED coefficient and regressed \\(D_C^{\\mathrm{QED}}\\) series are shown only as an optional diagnostic branch. They never modify the independent lock.', 'Diagnostic branch') +
       formulas +
-      tableHTML(['n', 'pure-QED \(A_1^{(2n)}\)', '\(c_n^{\mathrm{QED}}\)', 'Status'], rows, [1,2]);
+      tableHTML(['n', 'pure-QED \\(A_1^{(2n)}\\)', '\\(c_n^{\\mathrm{QED}}\\)', 'Status'], rows, [1,2]);
   }
 
   function renderAuditSection(result){
