@@ -44,6 +44,16 @@ The script also prints a raw Maxwell shell audit computed directly from the
 shell-source formulas. That raw audit is informative only; it is not fed into
 Lambda_geom^(mean) unless the user rewrites the vector representative block on
 purpose.
+
+Important output emphasis
+-------------------------
+The two most important final values are printed twice:
+1) inside the full lock summary table, and
+2) inside a dedicated highlighted box near the top of the report.
+
+That dedicated box always prints alpha_article. It prints alpha_QED,regressed
+numerically only when ARTICLE_PLUS_QED_DIAGNOSTICS is active; otherwise it
+prints the structural placeholder "×".
 """
 
 from dataclasses import dataclass
@@ -66,6 +76,7 @@ mp.mp.dps = 110
 
 PRINT_DIGITS = 28
 SCI_DIGITS = 12
+KEY_BOX_DIGITS = 34
 PREDICTION_ORDER = 10
 CURRENT_ARTICLE_RANK = 5
 REFINED_REFERENCE_RANK = 100
@@ -120,9 +131,9 @@ ARTICLE_PLUS_QED_DIAGNOSTICS = StructuralMode(
 
 # =============================================================================
 # ACTIVE_STRUCTURAL_MODE
-# Comment exactly one line and uncomment the other one.
+# Comment exactly one line and keep the other one active.
 # =============================================================================
-ACTIVE_STRUCTURAL_MODE = ARTICLE_ONLY_MODE
+# ACTIVE_STRUCTURAL_MODE = ARTICLE_ONLY_MODE
 ACTIVE_STRUCTURAL_MODE = ARTICLE_PLUS_QED_DIAGNOSTICS
 
 
@@ -997,6 +1008,80 @@ def print_header() -> None:
 
 
 
+def key_alpha_interpretation(optional_results: Optional[OptionalDiagnosticsResults]) -> str:
+    base = (
+        "alpha_article is the primary closed geometric output of the article branch. "
+        "alpha_QED,regressed comes from regressing the same locked D_C through the optional pure-QED g2/a_e shock chain. "
+        "Because that branch directly encodes the QED shock information, it is often expected to be benchmark-wise tighter or more precise numerically. "
+        "That usually makes alpha_QED,regressed a likely more accurate comparison value against alpha_exp, although it remains an external diagnostic refinement rather than the primary geometric lock itself."
+    )
+    if optional_results is None:
+        return (
+            base
+            + " In ARTICLE_ONLY_MODE the regressed QED alpha is intentionally suppressed and printed as ×. "
+            "Uncomment ARTICLE_PLUS_QED_DIAGNOSTICS to display it numerically."
+        )
+
+    article_gap = abs(optional_results.delta_alpha_article_vs_exp)
+    qed_gap = abs(optional_results.delta_alpha_qed_vs_exp)
+    if qed_gap < article_gap:
+        closeness = (
+            "In this run the QED-regressed alpha is numerically closer to alpha_exp than alpha_article."
+        )
+    elif qed_gap > article_gap:
+        closeness = (
+            "In this run alpha_article is numerically closer to alpha_exp than the QED-regressed alpha."
+        )
+    else:
+        closeness = (
+            "In this run both alpha outputs are equally close to alpha_exp within the printed precision."
+        )
+    return f"{closeness} {base}"
+
+
+
+def print_key_alpha_box(optional_results: Optional[OptionalDiagnosticsResults]) -> None:
+    key_table = Table(box=box.SIMPLE_HEAVY, show_header=False, expand=False)
+    key_table.add_column("Label", style="bold cyan", no_wrap=True)
+    key_table.add_column("Value", justify="right")
+
+    key_table.add_row("alpha_article", f"[bold yellow]{fmt(ALPHA_ARTICLE, KEY_BOX_DIGITS)}[/bold yellow]")
+    key_table.add_row("alpha_article^-1", f"[bold yellow]{fmt(ALPHA_ARTICLE_INV, KEY_BOX_DIGITS)}[/bold yellow]")
+    key_table.add_row(
+        "alpha_QED,regressed",
+        f"[bold green]{fmt_optional(optional_results.alpha_qed_regressed if optional_results else None, KEY_BOX_DIGITS)}[/bold green]",
+    )
+    key_table.add_row(
+        "alpha_QED,regressed^-1",
+        f"[bold green]{fmt_optional(optional_results.alpha_qed_regressed_inv if optional_results else None, KEY_BOX_DIGITS)}[/bold green]",
+    )
+    key_table.add_row(
+        "|alpha_article - alpha_exp|",
+        fmt_optional(abs(optional_results.delta_alpha_article_vs_exp) if optional_results else None, 16, sci=True),
+    )
+    key_table.add_row(
+        "|alpha_QED,regressed - alpha_exp|",
+        fmt_optional(abs(optional_results.delta_alpha_qed_vs_exp) if optional_results else None, 16, sci=True),
+    )
+    key_table.add_row("Interpretation", key_alpha_interpretation(optional_results))
+
+    subtitle = (
+        "alpha_QED,regressed is numeric only in ARTICLE_PLUS_QED_DIAGNOSTICS"
+        if optional_results
+        else "ARTICLE_ONLY_MODE active: optional QED regressed output is suppressed"
+    )
+    console.print(
+        Panel(
+            key_table,
+            title="Key final alpha outputs",
+            subtitle=subtitle,
+            border_style="bright_magenta",
+            expand=False,
+        )
+    )
+
+
+
 def print_structural_mode_table() -> None:
     rows = [
         ("ACTIVE_STRUCTURAL_MODE", ACTIVE_STRUCTURAL_MODE.name, "comment/uncomment exactly one assignment line"),
@@ -1256,6 +1341,11 @@ def print_audit_summary(optional_results: Optional[OptionalDiagnosticsResults]) 
             "same expansion order as the a_e ledger",
         ),
         (
+            "Key alpha box",
+            "printed near the top of the report",
+            "alpha_QED,regressed is numeric only when ARTICLE_PLUS_QED_DIAGNOSTICS is active",
+        ),
+        (
             "QED regressed alpha row",
             "printed numerically" if optional_results else "printed as ×",
             "controlled only by ACTIVE_STRUCTURAL_MODE",
@@ -1274,6 +1364,7 @@ def print_audit_summary(optional_results: Optional[OptionalDiagnosticsResults]) 
 
 def main() -> None:
     print_header()
+    print_key_alpha_box(OPTIONAL_RESULTS)
     print_structural_mode_table()
     print_exact_constants_table()
     print_vector_representative_table()
