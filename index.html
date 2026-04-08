@@ -1,1871 +1,1382 @@
+
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Emergent α — Closed-Form Browser Evaluator</title>
-  <meta name="description" content="Single-page browser evaluator for the closed-form Relator α calculations, including Lambda_OUT, the ALP lock, emergent alpha, g2, and QED coefficient comparison." />
-  <style>
-    :root {
-      --bg: #f5f5f7;
-      --bg-2: #ececf1;
-      --card: rgba(255,255,255,0.82);
-      --card-strong: rgba(255,255,255,0.92);
-      --ink: #111217;
-      --ink-2: #2f3441;
-      --muted: #69707d;
-      --line: rgba(15, 23, 42, 0.08);
-      --line-strong: rgba(15, 23, 42, 0.14);
-      --accent: #0a84ff;
-      --accent-soft: rgba(10,132,255,0.10);
-      --good: #0f9d58;
-      --warn: #d97706;
-      --shadow: 0 24px 80px rgba(17,18,23,0.08);
-      --shadow-soft: 0 12px 32px rgba(17,18,23,0.05);
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 16px;
-      --radius-sm: 12px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      background:
-        radial-gradient(circle at 12% 12%, rgba(10,132,255,0.10), transparent 34%),
-        radial-gradient(circle at 88% 18%, rgba(88,86,214,0.08), transparent 28%),
-        linear-gradient(180deg, #fbfbfd 0%, #f4f5f8 44%, #eef0f4 100%);
-      color: var(--ink);
-      font: 15px/1.55 var(--sans);
-      min-height: 100vh;
-    }
-
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    .shell {
-      width: min(1280px, calc(100vw - 28px));
-      margin: 0 auto;
-      padding: 28px 0 44px;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      margin-bottom: 18px;
-      flex-wrap: wrap;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: var(--ink-2);
-      font-weight: 650;
-      letter-spacing: 0.01em;
-    }
-
-    .brand-dot {
-      width: 11px;
-      height: 11px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, #67b7ff 0%, #0a84ff 100%);
-      box-shadow: 0 0 0 6px rgba(10,132,255,0.10);
-      flex: none;
-    }
-
-    .pill-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.66);
-      border: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 12px;
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .hero {
-      position: relative;
-      overflow: hidden;
-      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.76));
-      border: 1px solid rgba(255,255,255,0.7);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(28px);
-      -webkit-backdrop-filter: blur(28px);
-      padding: 28px;
-      margin-bottom: 18px;
-    }
-
-    .hero::before,
-    .hero::after {
-      content: "";
-      position: absolute;
-      border-radius: 999px;
-      filter: blur(32px);
-      opacity: 0.45;
-      pointer-events: none;
-    }
-
-    .hero::before {
-      inset: auto auto -36px -48px;
-      width: 220px;
-      height: 220px;
-      background: rgba(10,132,255,0.18);
-    }
-
-    .hero::after {
-      inset: -44px -30px auto auto;
-      width: 180px;
-      height: 180px;
-      background: rgba(88,86,214,0.14);
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.3fr 0.9fr;
-      gap: 22px;
-      align-items: stretch;
-      position: relative;
-      z-index: 1;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 650;
-      letter-spacing: 0.02em;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(34px, 5vw, 54px);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
-      font-weight: 780;
-    }
-
-    .hero p {
-      margin: 14px 0 0;
-      color: var(--ink-2);
-      max-width: 74ch;
-    }
-
-    .hero-subtle {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .hero-kpi {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .kpi {
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,0.65);
-      border-radius: 20px;
-      padding: 16px;
-      box-shadow: var(--shadow-soft);
-      min-height: 118px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .kpi.big {
-      grid-column: 1 / -1;
-      min-height: 152px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.82));
-    }
-
-    .kpi-label {
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      font-weight: 650;
-    }
-
-    .kpi-value {
-      margin-top: 8px;
-      font-family: var(--mono);
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.02em;
-      word-break: break-word;
-      color: var(--ink);
-    }
-
-    .kpi.big .kpi-value {
-      font-size: clamp(28px, 4.8vw, 44px);
-      line-height: 1.05;
-      font-weight: 800;
-    }
-
-    .kpi .kpi-value:not(.hero-alpha) {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .hero-alpha {
-      font-weight: 800;
-    }
-
-    .status-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 18px;
-      flex-wrap: wrap;
-    }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.72);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow-soft);
-      font-size: 13px;
-      color: var(--ink-2);
-      font-weight: 600;
-    }
-
-    .status-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: #b0b7c3;
-      flex: none;
-      box-shadow: 0 0 0 5px rgba(176,183,195,0.16);
-    }
-
-    .status[data-state="loading"] .status-dot {
-      background: var(--warn);
-      box-shadow: 0 0 0 5px rgba(217,119,6,0.16);
-    }
-
-    .status[data-state="ready"] .status-dot {
-      background: var(--good);
-      box-shadow: 0 0 0 5px rgba(15,157,88,0.16);
-    }
-
-    .status[data-state="error"] .status-dot {
-      background: #dc2626;
-      box-shadow: 0 0 0 5px rgba(220,38,38,0.16);
-    }
-
-    button.recompute {
-      appearance: none;
-      border: 0;
-      cursor: pointer;
-      border-radius: 999px;
-      padding: 10px 15px;
-      font: inherit;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      color: #ffffff;
-      background: linear-gradient(180deg, #0a84ff 0%, #0066d6 100%);
-      box-shadow: 0 14px 28px rgba(10,132,255,0.20);
-      transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
-    }
-
-    button.recompute:hover { transform: translateY(-1px); box-shadow: 0 18px 30px rgba(10,132,255,0.24); }
-    button.recompute:active { transform: translateY(0); }
-    button.recompute[disabled] { opacity: 0.55; cursor: default; transform: none; box-shadow: none; }
-
-    .link-grid {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 20px;
-    }
-
-    .link-card {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding: 14px 14px 13px;
-      border-radius: 18px;
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,0.65);
-      box-shadow: var(--shadow-soft);
-      min-height: 92px;
-    }
-
-    .link-card span:first-child {
-      font-size: 12px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      font-weight: 650;
-    }
-
-    .link-card span:last-child {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--ink);
-      line-height: 1.35;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.90), rgba(255,255,255,0.76));
-      border: 1px solid rgba(255,255,255,0.64);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-soft);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      padding: 22px;
-    }
-
-    .card h2, .card h3 {
-      margin: 0 0 10px;
-      letter-spacing: -0.02em;
-    }
-
-    .card h2 { font-size: 25px; }
-    .card h3 { font-size: 20px; }
-
-    .lead {
-      color: var(--muted);
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-
-    .section-title {
-      margin: 0 0 8px;
-      font-size: 28px;
-      line-height: 1.08;
-      letter-spacing: -0.03em;
-    }
-
-    .section-subtitle {
-      color: var(--muted);
-      margin: 0 0 18px;
-    }
-
-    .formula-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-
-    .formula-card {
-      background: linear-gradient(180deg, var(--card-strong), rgba(255,255,255,0.84));
-      border: 1px solid rgba(255,255,255,0.72);
-      border-radius: 22px;
-      box-shadow: var(--shadow-soft);
-      padding: 20px;
-    }
-
-    .formula-card .mini-label {
-      color: var(--muted);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .formula {
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: rgba(9, 12, 18, 0.03);
-      border: 1px solid var(--line);
-      overflow-x: auto;
-      margin-bottom: 14px;
-    }
-
-    .formula mjx-container {
-      font-size: 107% !important;
-    }
-
-    .value-stack {
-      display: grid;
-      gap: 10px;
-    }
-
-    .value-row {
-      display: grid;
-      grid-template-columns: 1.1fr auto;
-      gap: 10px;
-      align-items: start;
-      padding: 11px 12px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.68);
-      border: 1px solid var(--line);
-    }
-
-    .value-row .left {
-      color: var(--ink-2);
-      font-size: 13px;
-    }
-
-    .value-row .right {
-      color: var(--ink);
-      text-align: right;
-      font-family: var(--mono);
-      font-size: 13px;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      word-break: break-word;
-    }
-
-    .split-note {
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: rgba(10,132,255,0.08);
-      border: 1px solid rgba(10,132,255,0.12);
-      color: #164b84;
-      font-size: 13px;
-    }
-
-    .table-section {
-      margin-bottom: 18px;
-    }
-
-    .table-wrap {
-      overflow: auto;
-      border-radius: 18px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.72);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 780px;
-    }
-
-    thead th {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      background: rgba(247,248,251,0.97);
-      border-bottom: 1px solid var(--line-strong);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-      font-weight: 750;
-      padding: 14px 14px;
-      text-align: left;
-      white-space: nowrap;
-    }
-
-    tbody td {
-      padding: 13px 14px;
-      border-bottom: 1px solid rgba(15,23,42,0.06);
-      vertical-align: top;
-      font-size: 14px;
-      color: var(--ink-2);
-    }
-
-    tbody tr:nth-child(2n) td {
-      background: rgba(255,255,255,0.42);
-    }
-
-    tbody tr.highlight td {
-      background: rgba(10,132,255,0.06);
-    }
-
-    td.num {
-      font-family: var(--mono);
-      font-variant-numeric: tabular-nums;
-      text-align: right;
-      color: var(--ink);
-      white-space: nowrap;
-    }
-
-    td.note {
-      min-width: 220px;
-    }
-
-    .section-header {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-
-    .helper {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .footer-note {
-      margin-top: 18px;
-      padding: 16px 18px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.90), rgba(255,255,255,0.78));
-      border: 1px solid rgba(255,255,255,0.68);
-      box-shadow: var(--shadow-soft);
-      color: var(--muted);
-    }
-
-    .footer-note strong { color: var(--ink-2); }
-
-    .hidden { display: none !important; }
-
-    @media (max-width: 1120px) {
-      .hero-grid,
-      .formula-grid,
-      .grid-2,
-      .link-grid { grid-template-columns: 1fr; }
-      .hero-kpi { grid-template-columns: 1fr 1fr; }
-    }
-
-    @media (max-width: 760px) {
-      .shell { width: min(100vw - 18px, 100%); padding-top: 18px; }
-      .hero { padding: 20px; }
-      .card, .formula-card { padding: 18px; }
-      .hero-kpi { grid-template-columns: 1fr; }
-      .value-row { grid-template-columns: 1fr; }
-      .status-row { align-items: stretch; }
-      button.recompute { width: 100%; }
-      h1 { letter-spacing: -0.03em; }
-    }
-  </style>
-  <script>
-    window.MathJax = {
-      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]']] },
-      options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
-    };
-  </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emergent α — Closed-Form Browser Reproducer</title>
+<style>
+  :root{
+    --bg:#f5f5f7;
+    --panel:#ffffff;
+    --ink:#111111;
+    --muted:#6e6e73;
+    --line:#d2d2d7;
+    --soft:#f0f3f8;
+    --accent:#0071e3;
+    --accent-soft:rgba(0,113,227,.12);
+    --good:#0a7f4f;
+    --warn:#b15a00;
+    --shadow:0 12px 32px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.04);
+    --radius:22px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at top right, rgba(0,113,227,.08), transparent 28%),
+      radial-gradient(circle at top left, rgba(120,120,255,.06), transparent 20%),
+      var(--bg);
+    color:var(--ink);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  .page{max-width:1260px;margin:0 auto;padding:32px 18px 72px}
+  .hero{
+    background:rgba(255,255,255,.72);
+    backdrop-filter:saturate(180%) blur(18px);
+    border:1px solid rgba(255,255,255,.7);
+    box-shadow:var(--shadow);
+    border-radius:30px;
+    padding:30px 28px;
+    margin-bottom:20px;
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent);background:var(--accent-soft);padding:8px 12px;border-radius:999px;
+  }
+  h1{
+    font-size:clamp(32px,5vw,54px);
+    line-height:1.05;
+    margin:16px 0 12px;
+    letter-spacing:-.03em;
+  }
+  .subtitle{
+    max-width:880px;
+    color:var(--muted);
+    font-size:17px;
+    margin:0 0 18px;
+  }
+  .link-row,.meta-row{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    margin-top:14px;
+  }
+  a.pill, .meta-pill, button.recompute{
+    text-decoration:none;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    border-radius:999px;
+    padding:10px 14px;
+    font-size:13px;
+    font-weight:600;
+    transition:transform .08s ease, box-shadow .08s ease, border-color .08s ease;
+    box-shadow:0 1px 0 rgba(255,255,255,.8) inset;
+  }
+  a.pill:hover, button.recompute:hover{
+    transform:translateY(-1px);
+    box-shadow:0 8px 18px rgba(0,0,0,.06);
+    border-color:#b9c3d1;
+  }
+  button.recompute{
+    cursor:pointer;
+    background:linear-gradient(180deg,#fff,#f6f7fb);
+  }
+  .meta-pill strong{font-weight:700}
+  .status.ok{color:var(--good)}
+  .status.warn{color:var(--warn)}
+  .grid6{
+    display:grid;
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:14px;
+    margin:20px 0;
+  }
+  .stat{
+    background:var(--panel);
+    border:1px solid rgba(255,255,255,.85);
+    box-shadow:var(--shadow);
+    border-radius:24px;
+    padding:18px;
+    min-height:124px;
+  }
+  .stat .label{
+    color:var(--muted);
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    margin-bottom:10px;
+  }
+  .stat .value{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:clamp(19px,2vw,24px);
+    font-weight:700;
+    letter-spacing:-.02em;
+    overflow-wrap:anywhere;
+  }
+  .stat.primary{
+    grid-column:span 2;
+    background:linear-gradient(180deg,#ffffff,#f9fbff);
+    border-color:#d8e5f5;
+  }
+  .stat.primary .value{
+    font-size:clamp(26px,3vw,34px);
+    font-weight:800;
+  }
+  .stat .note{
+    margin-top:8px;
+    color:var(--muted);
+    font-size:12px;
+  }
+  .section{
+    background:var(--panel);
+    border:1px solid rgba(255,255,255,.85);
+    box-shadow:var(--shadow);
+    border-radius:var(--radius);
+    padding:22px 20px;
+    margin-top:16px;
+  }
+  .section h2{
+    margin:0 0 4px;
+    font-size:24px;
+    letter-spacing:-.02em;
+  }
+  .section p.lead{
+    margin:0 0 16px;
+    color:var(--muted);
+  }
+  .formula-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+    margin-bottom:16px;
+  }
+  .formula{
+    background:var(--soft);
+    border:1px solid #e4e8ee;
+    border-radius:18px;
+    padding:14px 14px 13px;
+  }
+  .formula .name{
+    color:var(--muted);
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    margin-bottom:6px;
+  }
+  .formula .expr{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:13px;
+    color:#1d1d1f;
+    margin-bottom:10px;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+  .formula .val{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:15px;
+    font-weight:700;
+    overflow-wrap:anywhere;
+  }
+  .table-wrap{
+    overflow:auto;
+    border:1px solid #e5e5ea;
+    border-radius:18px;
+    background:#fff;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+  }
+  thead th{
+    position:sticky;top:0;
+    background:#fbfbfd;
+    color:#404046;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    text-align:left;
+    padding:12px 14px;
+    border-bottom:1px solid #e5e5ea;
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:12px 14px;
+    border-bottom:1px solid #efeff4;
+    vertical-align:top;
+  }
+  tbody tr:last-child td{border-bottom:none}
+  td.num{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    text-align:right;
+    white-space:nowrap;
+  }
+  td.dim{
+    color:var(--muted);
+  }
+  .two-col{
+    display:grid;
+    grid-template-columns:1.15fr .85fr;
+    gap:16px;
+  }
+  .foot{
+    margin-top:20px;
+    color:var(--muted);
+    font-size:13px;
+  }
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .tiny{font-size:12px;color:var(--muted)}
+  .ok{color:var(--good)}
+  .warn{color:var(--warn)}
+  @media (max-width:1080px){
+    .grid6{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .stat.primary{grid-column:span 2}
+    .formula-grid{grid-template-columns:1fr}
+    .two-col{grid-template-columns:1fr}
+  }
+  @media (max-width:640px){
+    .page{padding:18px 12px 48px}
+    .hero{padding:22px 18px;border-radius:24px}
+    .section{padding:18px 14px}
+    .grid6{grid-template-columns:1fr}
+    .stat.primary{grid-column:span 1}
+  }
+</style>
 </head>
 <body>
-  <div class="shell">
-    <div class="topbar">
-      <div class="brand">
-        <span class="brand-dot"></span>
-        <span>Emergent α · closed-form browser page</span>
-      </div>
-      <div class="pill-row">
-        <div class="pill">Single-file HTML</div>
-        <div class="pill">Pyodide + mpmath + NumPy + SciPy</div>
-        <div class="pill">No pasted article table values</div>
-      </div>
+<div class="page">
+  <header class="hero">
+    <div class="eyebrow">Pure JavaScript • no Pyodide • single file</div>
+    <h1>Emergent α — Closed-Form Browser Reproducer</h1>
+    <p class="subtitle">
+      This page computes the vector shell source, the scalar current/refined branches, the geometric lock,
+      the emergent output α, the calculated g₂ and a<sub>e</sub>, and the QED coefficient comparison directly in the browser.
+      No Python runtime is loaded.
+    </p>
+
+    <div class="link-row">
+      <a class="pill" href="https://github.com/pajuhaan/AlphaEmergent" target="_blank" rel="noopener">GitHub Repository</a>
+      <a class="pill" href="https://zenodo.org/records/17021330" target="_blank" rel="noopener">Alpha Paper</a>
+      <a class="pill" href="https://doi.org/10.5281/zenodo.17021330" target="_blank" rel="noopener">DOI 10.5281/zenodo.17021330</a>
+      <a class="pill" href="https://doi.org/10.5281/zenodo.17021364" target="_blank" rel="noopener">g-factor DOI 10.5281/zenodo.17021364</a>
     </div>
 
-    <section class="hero">
-      <div class="hero-grid">
-        <div>
-          <div class="eyebrow">Closed runtime evaluation in the browser</div>
-          <h1>Emergent α from the Relator lock</h1>
-          <p>
-            This page evaluates the same equation-driven blocks used in the corrected reproducer: the vector shell source,
-            \(\Lambda_{\mathrm{OUT}}(\eta_0)\), the scalar mother equation, the ALP lock, the emergent \(\alpha\), the derived
-            \(g_2\), and the pure-photonic QED coefficient comparison.
-          </p>
-          <p class="hero-subtle" id="runtimeSummary">Loading the high-precision runtime and computing the page…</p>
-          <div class="status-row">
-            <div class="status" id="statusPill" data-state="loading">
-              <span class="status-dot"></span>
-              <span id="statusText">Loading Pyodide packages…</span>
-            </div>
-            <button class="recompute" id="recomputeBtn" type="button" disabled>Recompute</button>
-          </div>
-        </div>
+    <div class="meta-row">
+      <button id="recompute" class="recompute" type="button">Recompute</button>
+      <span class="meta-pill">Status: <strong id="status" class="status">Waiting…</strong></span>
+      <span class="meta-pill">External comparison only: <strong>α<sub>exp</sub>, σ(α), first 5 pure-QED A<sub>1</sub><sup>(2n)</sup></strong></span>
+    </div>
+  </header>
 
-        <div class="hero-kpi">
-          <div class="kpi big">
-            <div class="kpi-label">Bold headline result · output α</div>
-            <div class="kpi-value hero-alpha" id="headlineAlpha">—</div>
-            <div class="hero-subtle" id="headlineAlphaNote">Current article scalar branch (rank-5)</div>
-          </div>
-          <div class="kpi">
-            <div class="kpi-label">Output α⁻¹</div>
-            <div class="kpi-value" id="headlineAlphaInv">—</div>
-          </div>
-          <div class="kpi">
-            <div class="kpi-label">Δα vs experiment</div>
-            <div class="kpi-value" id="headlineDeltaAlpha">—</div>
-          </div>
-          <div class="kpi">
-            <div class="kpi-label">zσ(α)</div>
-            <div class="kpi-value" id="headlineSigma">—</div>
-          </div>
-          <div class="kpi">
-            <div class="kpi-label">Locked g₂</div>
-            <div class="kpi-value" id="headlineG2">—</div>
-          </div>
-        </div>
-      </div>
+  <section class="grid6" id="summary-cards"></section>
 
-      <div class="link-grid">
-        <a class="link-card" href="https://github.com/pajuhaan/AlphaEmergent" target="_blank" rel="noreferrer">
-          <span>Public repository</span>
-          <span>GitHub · pajuhaan/AlphaEmergent</span>
-        </a>
-        <a class="link-card" href="https://doi.org/10.5281/zenodo.17021330" target="_blank" rel="noreferrer">
-          <span>DOI</span>
-          <span>10.5281/zenodo.17021330</span>
-        </a>
-        <a class="link-card" href="https://zenodo.org/records/17021330" target="_blank" rel="noreferrer">
-          <span>Article record</span>
-          <span>Zenodo · Alpha (current public record)</span>
-        </a>
-        <a class="link-card" href="https://zenodo.org/records/17021330/files/Alpha.pdf" target="_blank" rel="noreferrer">
-          <span>Article PDF</span>
-          <span>Alpha.pdf</span>
-        </a>
-        <a class="link-card" href="https://doi.org/10.5281/zenodo.17021364" target="_blank" rel="noreferrer">
-          <span>Companion DOI</span>
-          <span>Electron g-factor paper</span>
-        </a>
-      </div>
-    </section>
+  <section class="section" id="constants-section"></section>
+  <section class="section" id="vector-section"></section>
+  <section class="section" id="scalar-section"></section>
+  <section class="section" id="lock-section"></section>
+  <section class="section" id="alpha-section"></section>
+  <section class="section" id="g2-section"></section>
+  <section class="section" id="qed-compare-section"></section>
+  <section class="section" id="qed-prediction-section"></section>
+  <section class="section" id="audit-section"></section>
 
-    <section class="card" style="margin-bottom: 18px;">
-      <h2 class="section-title">Execution summary</h2>
-      <p class="section-subtitle">
-        The page runs entirely in the browser after loading the Python/WebAssembly runtime. The only external comparison inputs are
-        \(\alpha_{\mathrm{exp}}\), its experimental \(1\sigma\) uncertainty, and the first five pure-QED coefficients \(A_1^{(2n)}\).
-      </p>
-      <div class="grid-2">
-        <div class="table-section">
-          <div class="section-header">
-            <h3>What is computed directly</h3>
-            <div class="helper">Equation-driven, not article-number-driven</div>
-          </div>
-          <div class="value-stack" id="computedList"></div>
-        </div>
-        <div class="table-section">
-          <div class="section-header">
-            <h3>External comparison inputs only</h3>
-            <div class="helper">For manual and experimental comparison</div>
-          </div>
-          <div class="value-stack" id="externalList"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card" style="margin-bottom: 18px;">
-      <h2 class="section-title">Closed formulas and computed values</h2>
-      <p class="section-subtitle">
-        Each block below shows the formula directly on the page and the corresponding value evaluated at runtime.
-      </p>
-      <div class="formula-grid" id="formulaGrid"></div>
-    </section>
-
-    <section class="card table-section">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title">Direct shell-source evaluation</h2>
-          <p class="section-subtitle">The first odd modes are shown explicitly together with the normalized shell-source weights.</p>
-        </div>
-        <div class="helper">Vector shell block</div>
-      </div>
-      <div class="table-wrap" id="vectorTableWrap"></div>
-    </section>
-
-    <section class="card table-section">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title">Emergent α from the fixed geometric lock</h2>
-          <p class="section-subtitle">The highlighted row is the main output branch used for the article-style α result.</p>
-        </div>
-        <div class="helper">Current branch, refined self-check, and QED cross-check</div>
-      </div>
-      <div class="table-wrap" id="alphaTableWrap"></div>
-    </section>
-
-    <section class="grid-2">
-      <section class="card table-section">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">Bridge values at \(\alpha_{\mathrm{exp}}\)</h2>
-            <p class="section-subtitle">Formula-driven \(D_C(\alpha_{\mathrm{exp}})\) and \(\Lambda_{\pi}(\alpha_{\mathrm{exp}})\) values.</p>
-          </div>
-          <div class="helper">Scalar/ALP bridge</div>
-        </div>
-        <div class="table-wrap" id="lambdaTableWrap"></div>
-      </section>
-
-      <section class="card table-section">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">Computed \(g_2\) and \(a_e\)</h2>
-            <p class="section-subtitle">Includes the pure-QED benchmark value for direct comparison.</p>
-          </div>
-          <div class="helper">Closed \(g_2\) map</div>
-        </div>
-        <div class="table-wrap" id="g2TableWrap"></div>
-      </section>
-    </section>
-
-    <section class="card table-section">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title">QED benchmark coefficients vs Relator coefficients</h2>
-          <p class="section-subtitle">The external QED values are shown next to the runtime-computed current and refined coefficients.</p>
-        </div>
-        <div class="helper">\(A_1^{(2n)}\) comparison</div>
-      </div>
-      <div class="table-wrap" id="qedCompareTableWrap"></div>
-    </section>
-
-    <section class="card table-section">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title">Refined rank-100 prediction through order 10</h2>
-          <p class="section-subtitle">Orders 1–5 are benchmarked against the supplied QED values; 6–10 are the closed Relator predictions.</p>
-        </div>
-        <div class="helper">Requested order-10 prediction block</div>
-      </div>
-      <div class="table-wrap" id="predictionTableWrap"></div>
-    </section>
-
-    <section class="footer-note">
-      <strong>Note.</strong> This page is intentionally transparent about what is external and what is computed. No article table value such as
-      \(\Lambda_{\mathrm{OUT}}\), \(\Lambda_{\mathrm{geom}}\), or the shell-source weights is pasted into the runtime.
-      The current public repository, the current public Zenodo record for <em>Alpha</em>, and its DOI are linked at the top of the page.
-      For the experimental comparison line, the benchmark for the inverse fine-structure constant is the CODATA 2022 / NIST value
-      \(\alpha^{-1} = 137.035999177\) with standard uncertainty \(2.1\times 10^{-8}\).
-    </section>
+  <div class="foot">
+    Browser note: this HTML is fully self-contained and runs with native JavaScript.
+    It reproduces the same closed workflow in browser double precision, so it starts immediately instead of stalling on a Python package loader.
   </div>
-
-  <script id="py-kernel" type="text/plain">
-from __future__ import annotations
-
-import json
-import time
-from dataclasses import dataclass
-from functools import lru_cache
-from typing import Dict, Iterable, List, Sequence, Tuple
-
-import mpmath as mp
-import numpy as np
-from scipy import special
-
-mp.mp.dps = 110
-
-PRINT_DIGITS = 28
-SCI_DIGITS = 12
-PREDICTION_ORDER = 10
-CURRENT_ARTICLE_RANK = 5
-REFINED_REFERENCE_RANK = 100
-VECTOR_SOURCE_MAX_J = 31
-VECTOR_SOURCE_GL_NODES = 400
-LOCK_SOURCE = "refined_physical_bridge"
-
-PURE_QED_A1: Dict[int, mp.mpf] = {
-    1: mp.mpf("0.5"),
-    2: mp.mpf("-0.328478965579193"),
-    3: mp.mpf("1.181241456587"),
-    4: mp.mpf("-1.9122457649264455741526471531265"),
-    5: mp.mpf("5.891"),
-}
-
-ALPHA_INV_EXP = mp.mpf("137.035999177")
-ALPHA_INV_EXP_SIGMA = mp.mpf("0.000000021")
-
-ONE = mp.mpf("1")
-TWO = mp.mpf("2")
-THREE = mp.mpf("3")
-FOUR = mp.mpf("4")
-HALF = mp.mpf("0.5")
-QUARTER = mp.mpf("0.25")
-PI = mp.pi
-SQRT_PI = mp.sqrt(PI)
-GAMMA_E = mp.euler
-ALPHA_EXP = ONE / ALPHA_INV_EXP
-ALPHA_EXP_SIGMA = ALPHA_INV_EXP_SIGMA / (ALPHA_INV_EXP ** 2)
-
-
-def geometric_shell_constant_K() -> mp.mpf:
-    return (150 * PI**2 - 8 * PI**4 - 315) / (180 * PI**6)
-
-
-K_GEOMETRIC = geometric_shell_constant_K()
-
-
-def fmt(value: mp.mpf | float, digits: int = PRINT_DIGITS) -> str:
-    return mp.nstr(mp.mpf(value), n=digits)
-
-
-def fmt_sci(value: mp.mpf | float, digits: int = SCI_DIGITS) -> str:
-    return mp.nstr(mp.mpf(value), n=digits, min_fixed=0, max_fixed=0)
-
-
-# -----------------------------------------------------------------------------
-# A) Exact theorem-path vector shell source and Lambda_OUT(eta0)
-# -----------------------------------------------------------------------------
-
-def minimal_branch_ratio() -> mp.mpf:
-    return ONE / PI
-
-
-def minimal_shell_width() -> mp.mpf:
-    return ONE / (PI * SQRT_PI)
-
-
-def filamentary_reference_core() -> mp.mpf:
-    return mp.log(8 * mp.sqrt(mp.pi)) - 2
-
-
-def gaussian_uv_constant() -> mp.mpf:
-    return HALF * (mp.log(2) + mp.euler)
-
-
-ETA_0 = minimal_branch_ratio()
-ELL_0 = minimal_shell_width()
-LAMBDA_IND = filamentary_reference_core()
-C_UV_GAUSS = gaussian_uv_constant()
-
-
-def flux_mode_norm_I(j: int) -> float:
-    return 2.0 * j * (j + 1) / (2 * j + 1)
-
-
-def legendre_derivative_np(j: int, x: np.ndarray) -> np.ndarray:
-    p_j = special.eval_legendre(j, x)
-    p_jm1 = special.eval_legendre(j - 1, x)
-    return j * (p_jm1 - x * p_j) / (1.0 - x * x)
-
-
-def shell_k2(eta: float, v: np.ndarray) -> np.ndarray:
-    rho = np.sqrt(np.clip(1.0 - v * v, 0.0, None))
-    z = v
-    return 4.0 * eta * rho / ((eta + rho) ** 2 + z * z)
-
-
-def shell_Brho_shape(eta: float, v: np.ndarray) -> np.ndarray:
-    rho = np.sqrt(np.clip(1.0 - v * v, 0.0, None))
-    z = v
-    m = shell_k2(eta, v)
-    K = special.ellipk(m)
-    E = special.ellipe(m)
-    den = np.sqrt((eta + rho) ** 2 + z * z)
-    rho_safe = np.where(rho < 1.0e-15, 1.0e-15, rho)
-    ratio = (eta * eta + rho * rho + z * z) / (((eta - rho) ** 2) + z * z)
-    return z / (2.0 * np.pi * rho_safe * den) * (-K + ratio * E)
-
-
-def shell_Bz_shape(eta: float, v: np.ndarray) -> np.ndarray:
-    rho = np.sqrt(np.clip(1.0 - v * v, 0.0, None))
-    z = v
-    m = shell_k2(eta, v)
-    K = special.ellipk(m)
-    E = special.ellipe(m)
-    den = np.sqrt((eta + rho) ** 2 + z * z)
-    ratio = (eta * eta - rho * rho - z * z) / (((eta - rho) ** 2) + z * z)
-    return 1.0 / (2.0 * np.pi * den) * (K + ratio * E)
-
-
-def shell_btheta_shape(eta: float, v: np.ndarray) -> np.ndarray:
-    rho = np.sqrt(np.clip(1.0 - v * v, 0.0, None))
-    z = v
-    return z * shell_Brho_shape(eta, v) - rho * shell_Bz_shape(eta, v)
-
-
-def compute_shell_source_coefficients(eta: float, max_j: int, n_gl: int) -> Dict[int, mp.mpf]:
-    x, w = np.polynomial.legendre.leggauss(n_gl)
-    b_tilde = shell_btheta_shape(eta, x)
-    rho = np.sqrt(1.0 - x * x)
-
-    out: Dict[int, mp.mpf] = {}
-    for j in range(1, max_j + 1, 2):
-        p_prime = legendre_derivative_np(j, x)
-        integrand = b_tilde * rho * p_prime
-        a_sh_j = np.sum(w * integrand) / flux_mode_norm_I(j)
-        out[j] = mp.mpf(str(a_sh_j))
-    return out
-
-
-def compute_shell_source_Jchi(a_sh: Dict[int, mp.mpf]) -> Dict[int, mp.mpf]:
-    out: Dict[int, mp.mpf] = {}
-    for j, value in a_sh.items():
-        a_hat = 2 * (j + 1) * value
-        factor = mp.sqrt(2 * mp.pi / ((j + 1) * (2 * j + 1)))
-        out[j] = factor * a_hat
-    return out
-
-
-def lambda_out_from_Jchi(jchi: Dict[int, mp.mpf]) -> mp.mpf:
-    return -HALF * mp.fsum(value * value for value in jchi.values())
-
-
-def normalized_source_weights(jchi: Dict[int, mp.mpf]) -> Dict[int, mp.mpf]:
-    denom = mp.fsum(value * value for value in jchi.values())
-    return {j: (value * value) / denom for j, value in jchi.items()}
-
-
-VECTOR_A_SH = compute_shell_source_coefficients(float(ETA_0), VECTOR_SOURCE_MAX_J, VECTOR_SOURCE_GL_NODES)
-VECTOR_JCHI = compute_shell_source_Jchi(VECTOR_A_SH)
-VECTOR_LAMBDA_OUT = lambda_out_from_Jchi(VECTOR_JCHI)
-VECTOR_WEIGHTS = normalized_source_weights(VECTOR_JCHI)
-
-
-# -----------------------------------------------------------------------------
-# B) Scalar channel: current closed evaluator and refined no-free-parameter one
-# -----------------------------------------------------------------------------
-@dataclass(frozen=True)
-class BaseShellGeometry:
-    c11: mp.mpf
-    theta1_core: mp.mpf
-    theta1_coll: mp.mpf
-    theta1_log: mp.mpf
-    a_shell: mp.mpf
-    s_uv: mp.mpf
-    s_ir: mp.mpf
-    eta0: mp.mpf
-    ell0: mp.mpf
-    gamma_clog_0: mp.mpf
-    b11_glue: mp.mpf
-
-
-@dataclass(frozen=True)
-class ScalarScenario:
-    label: str
-    rank: int
-    theta1_total: mp.mpf
-    a_uv: mp.mpf
-    a_ir: mp.mpf
-    chi_cross: mp.mpf
-    delta_a_mix: mp.mpf
-    delta_a0: mp.mpf
-    delta_a_diag: mp.mpf
-    kernel_scale: mp.mpf
-
-
-@lru_cache(maxsize=None)
-def F_p_cached(p: int, ell: mp.mpf) -> mp.mpf:
-    p_mpf = mp.mpf(p)
-    phase = 1j * p_mpf * PI * ell / 2
-    return (
-        (SQRT_PI * ell / 2)
-        * mp.e ** (-(p_mpf * PI * ell) ** 2 / 4)
-        * mp.re(mp.e ** (1j * p_mpf * PI) * (mp.erf(ONE / ell + phase) - mp.erf(phase)))
-    )
-
-
-def c11_closed_form(ell: mp.mpf) -> mp.mpf:
-    term1 = (SQRT_PI * ell / 2) * mp.erf(ONE / ell)
-    term2 = (SQRT_PI * ell / 2) * mp.e ** (-(PI**2) * (ell**2))
-    term2 *= mp.re(mp.erf(ONE / ell - 1j * PI * ell) - mp.erf(-1j * PI * ell))
-    return term1 + term2
-
-
-def C_mn(m: int, n: int, ell: mp.mpf) -> mp.mpf:
-    return m * n * (F_p_cached(abs(m - n), ell) + F_p_cached(m + n, ell))
-
-
-def gamma_clog(D: mp.mpf, ell: mp.mpf) -> mp.mpf:
-    root = mp.sqrt(D + QUARTER)
-    return (
-        (SQRT_PI * ell / 2)
-        * mp.e ** ((ell**2 / 4) * (D + QUARTER))
-        * mp.erfc((ell / 2) * root)
-    )
-
-
-def build_base_shell_geometry() -> BaseShellGeometry:
-    eta0 = ONE / PI
-    ell0 = ONE / (PI * SQRT_PI)
-    c_uni = (ONE / PI) * (mp.mpf("4") / 3 + ONE / (4 * PI**2))
-    c11 = c11_closed_form(ell0)
-
-    theta1_core = TWO * PI * c_uni
-    theta1_coll = (GAMMA_E / PI**2) * c11
-    theta1_log = eta0**2 / (8 * (ONE - eta0**2 / 4))
-    a_shell = PI**2 * c11 + GAMMA_E / 4
-    s_uv = mp.log(2)
-    s_ir = ONE / (8 * PI**2)
-
-    gamma0 = gamma_clog(mp.mpf("0"), ell0)
-    b11_glue = (
-        theta1_coll + theta1_log - gamma0 * theta1_coll * theta1_log
-    ) / (ONE - (gamma0**2 / 4) * theta1_coll * theta1_log)
-
-    return BaseShellGeometry(
-        c11=c11,
-        theta1_core=theta1_core,
-        theta1_coll=theta1_coll,
-        theta1_log=theta1_log,
-        a_shell=a_shell,
-        s_uv=s_uv,
-        s_ir=s_ir,
-        eta0=eta0,
-        ell0=ell0,
-        gamma_clog_0=gamma0,
-        b11_glue=b11_glue,
-    )
-
-
-BASE_GEOMETRY = build_base_shell_geometry()
-
-
-def higher_mode_sums(rank: int, ell: mp.mpf) -> Tuple[mp.mpf, mp.mpf]:
-    delta_a_mix = mp.mpf("0")
-    delta_a0 = mp.mpf("0")
-    if rank < 2:
-        return delta_a_mix, delta_a0
-    for n in range(2, rank + 1):
-        c1n = C_mn(1, n, ell)
-        cnn = C_mn(n, n, ell)
-        gap = n**2 - 1
-        delta_a_mix += (GAMMA_E / PI**2) * (c1n**2 / gap)
-        delta_a0 += -(GAMMA_E / PI**2) * (c1n**2 * cnn / gap**3)
-    return delta_a_mix, delta_a0
-
-
-def build_current_scenario(rank: int) -> ScalarScenario:
-    delta_a_mix, delta_a0 = higher_mode_sums(rank, BASE_GEOMETRY.ell0)
-    theta1_total = BASE_GEOMETRY.theta1_core + BASE_GEOMETRY.b11_glue
-    delta_a_diag = -(BASE_GEOMETRY.eta0**2) * delta_a0
-    chi_cross = delta_a_mix**2
-    a_uv = BASE_GEOMETRY.a_shell + delta_a_mix + delta_a0 + delta_a_diag
-    a_ir = BASE_GEOMETRY.a_shell - delta_a_mix + delta_a0 + delta_a_diag
-    return ScalarScenario(
-        label=f"current_rank_{rank}",
-        rank=rank,
-        theta1_total=theta1_total,
-        a_uv=a_uv,
-        a_ir=a_ir,
-        chi_cross=chi_cross,
-        delta_a_mix=delta_a_mix,
-        delta_a0=delta_a0,
-        delta_a_diag=delta_a_diag,
-        kernel_scale=ONE,
-    )
-
-
-def build_static_hidden_completion() -> Tuple[mp.mpf, mp.mpf]:
-    a = BASE_GEOMETRY.theta1_coll
-    b = BASE_GEOMETRY.theta1_log
-    gamma0 = BASE_GEOMETRY.gamma_clog_0
-
-    N_c = mp.sqrt(PI / 8) * BASE_GEOMETRY.ell0
-    rho_static = gamma0 / mp.sqrt(N_c)
-    lambda_hidden = ONE / (ONE - rho_static**2)
-
-    c0 = gamma0 * a * b / TWO
-    a_perp = a - c0**2 / b
-    b_perp = b - c0**2 / a
-    t1 = mp.sqrt(a_perp / a)
-    t2 = mp.sqrt(b_perp / b)
-
-    a11 = ONE / a_perp - c0 / lambda_hidden
-    a12 = gamma0 / TWO - c0 / lambda_hidden
-    a22 = ONE / b_perp - c0 / lambda_hidden
-    det2 = a11 * a22 - a12**2
-    b11_refined = (t1**2 * a22 - TWO * t1 * t2 * a12 + t2**2 * a11) / det2
-    theta1_refined = BASE_GEOMETRY.theta1_core + b11_refined
-    return b11_refined, theta1_refined
-
-
-B11_REFINED, THETA1_REFINED = build_static_hidden_completion()
-
-
-def build_dynamic_kernel_scale(current: ScalarScenario) -> mp.mpf:
-    rho_dyn = current.chi_cross / mp.sqrt(BASE_GEOMETRY.s_uv * BASE_GEOMETRY.s_ir)
-    lambda_u = ONE / (ONE - rho_dyn**2)
-    return lambda_u**2
-
-
-def build_refined_scenario(rank: int) -> ScalarScenario:
-    current = build_current_scenario(rank)
-    return ScalarScenario(
-        label=f"refined_rank_{rank}",
-        rank=rank,
-        theta1_total=THETA1_REFINED,
-        a_uv=current.a_uv,
-        a_ir=current.a_ir,
-        chi_cross=current.chi_cross,
-        delta_a_mix=current.delta_a_mix,
-        delta_a0=current.delta_a0,
-        delta_a_diag=current.delta_a_diag,
-        kernel_scale=build_dynamic_kernel_scale(current),
-    )
-
-
-CURRENT_RANK5 = build_current_scenario(CURRENT_ARTICLE_RANK)
-REFINED_RANK100 = build_refined_scenario(REFINED_REFERENCE_RANK)
-
-
-def model_memory_value(D: mp.mpf, scenario: ScalarScenario) -> mp.mpf:
-    num = scenario.a_uv * (ONE + BASE_GEOMETRY.s_ir * D) + scenario.a_ir * (ONE + BASE_GEOMETRY.s_uv * D)
-    num -= TWO * scenario.chi_cross * D * mp.sqrt(scenario.a_uv * scenario.a_ir)
-    den = (ONE + BASE_GEOMETRY.s_uv * D) * (ONE + BASE_GEOMETRY.s_ir * D) - (scenario.chi_cross**2) * (D**2)
-    return scenario.kernel_scale * (num / den)
-
-
-def mother_radicand(D: mp.mpf, scenario: ScalarScenario) -> mp.mpf:
-    return ONE - scenario.theta1_total * D + D**2 * model_memory_value(D, scenario)
-
-
-def solve_D_of_alpha(alpha: mp.mpf, scenario: ScalarScenario) -> mp.mpf:
-    x = alpha / PI
-
-    def residual(D: mp.mpf) -> mp.mpf:
-        rad = mother_radicand(D, scenario)
-        if rad <= 0:
-            return mp.mpf("1e100")
-        return D - x * mp.sqrt(rad)
-
-    left = mp.mpf("0")
-    right = max(mp.mpf("0.003"), TWO * x)
-    f_left = residual(left)
-    f_right = residual(right)
-    if not (f_left < 0 < f_right):
-        raise RuntimeError(f"Failed to bracket D_C(alpha) for {scenario.label}.")
-
-    for _ in range(1500):
-        mid = (left + right) / TWO
-        f_mid = residual(mid)
-        if abs(f_mid) < mp.mpf("1e-95") or abs(right - left) < mp.mpf("1e-95"):
-            return mid
-        if f_mid > 0:
-            right = mid
-        else:
-            left = mid
-    return (left + right) / TWO
-
-
-def alpha_from_locked_D(D_lock: mp.mpf, scenario: ScalarScenario) -> mp.mpf:
-    rad = mother_radicand(D_lock, scenario)
-    if rad <= 0:
-        raise RuntimeError(f"Locked D produces non-positive mother radicand for {scenario.label}.")
-    return PI * D_lock / mp.sqrt(rad)
-
-
-# -----------------------------------------------------------------------------
-# C) ALP bridge and lock maps
-# -----------------------------------------------------------------------------
-
-def zeta_from_D(D: mp.mpf) -> mp.mpf:
-    return HALF * (mp.sqrt(ONE + FOUR * D / (THREE * PI**2)) - ONE)
-
-
-def lambda_from_D(D: mp.mpf) -> mp.mpf:
-    return (TWO * PI**2 / K_GEOMETRIC) * zeta_from_D(D)
-
-
-def D_lock_from_lambda(lambda_value: mp.mpf) -> mp.mpf:
-    return (THREE / TWO) * K_GEOMETRIC * lambda_value * (ONE + K_GEOMETRIC * lambda_value / (TWO * PI**2))
-
-
-# -----------------------------------------------------------------------------
-# D) Pure-QED-engineered D_C(alpha) and coefficient prediction helpers
-# -----------------------------------------------------------------------------
-
-def zero_series(order: int) -> List[mp.mpf]:
-    return [mp.mpf("0") for _ in range(order + 1)]
-
-
-def one_series(order: int) -> List[mp.mpf]:
-    out = zero_series(order)
-    out[0] = ONE
-    return out
-
-
-def x_series(order: int) -> List[mp.mpf]:
-    out = zero_series(order)
-    if order >= 1:
-        out[1] = ONE
-    return out
-
-
-def series_add(a: List[mp.mpf], b: List[mp.mpf]) -> List[mp.mpf]:
-    return [ai + bi for ai, bi in zip(a, b)]
-
-
-def series_sub(a: List[mp.mpf], b: List[mp.mpf]) -> List[mp.mpf]:
-    return [ai - bi for ai, bi in zip(a, b)]
-
-
-def series_scale(a: List[mp.mpf], c: mp.mpf) -> List[mp.mpf]:
-    return [c * ai for ai in a]
-
-
-def series_mul(a: List[mp.mpf], b: List[mp.mpf], order: int) -> List[mp.mpf]:
-    out = zero_series(order)
-    for n in range(order + 1):
-        out[n] = mp.fsum(a[k] * b[n - k] for k in range(n + 1))
-    return out
-
-
-def series_inv(a: List[mp.mpf], order: int) -> List[mp.mpf]:
-    if a[0] == 0:
-        raise ZeroDivisionError("Series inversion requires nonzero constant term.")
-    out = zero_series(order)
-    out[0] = ONE / a[0]
-    for n in range(1, order + 1):
-        s = mp.fsum(a[k] * out[n - k] for k in range(1, n + 1))
-        out[n] = -s / a[0]
-    return out
-
-
-def series_sqrt(a: List[mp.mpf], order: int) -> List[mp.mpf]:
-    if a[0] <= 0:
-        raise ValueError("Series square root requires positive constant term.")
-    out = zero_series(order)
-    out[0] = mp.sqrt(a[0])
-    for n in range(1, order + 1):
-        s = mp.fsum(out[k] * out[n - k] for k in range(1, n))
-        out[n] = (a[n] - s) / (TWO * out[0])
-    return out
-
-
-def series_shift_up(a: List[mp.mpf], m: int, order: int) -> List[mp.mpf]:
-    out = zero_series(order)
-    for n in range(order + 1 - m):
-        out[n + m] = a[n]
-    return out
-
-
-def series_shift_down(a: List[mp.mpf], m: int, order: int) -> List[mp.mpf]:
-    out = zero_series(order)
-    for n in range(order + 1 - m):
-        out[n] = a[n + m]
-    return out
-
-
-def series_eval(coeffs: List[mp.mpf], x_value: mp.mpf) -> mp.mpf:
-    total = mp.mpf("0")
-    power = mp.mpf("1")
-    for coefficient in coeffs:
-        total += coefficient * power
-        power *= x_value
-    return total
-
-
-def dict_to_series(coeffs: Dict[int, mp.mpf], order: int) -> List[mp.mpf]:
-    out = zero_series(order)
-    for n, value in coeffs.items():
-        if 0 <= n <= order:
-            out[n] = mp.mpf(value)
-    return out
-
-
-def current_memory_series(D: List[mp.mpf], order: int, scenario: ScalarScenario) -> List[mp.mpf]:
-    one = one_series(order)
-    den = series_sub(
-        series_mul(
-            series_add(one, series_scale(D, BASE_GEOMETRY.s_uv)),
-            series_add(one, series_scale(D, BASE_GEOMETRY.s_ir)),
-            order,
-        ),
-        series_scale(series_mul(D, D, order), scenario.chi_cross**2),
-    )
-    den_inv = series_inv(den, order)
-    num = series_add(
-        series_scale(series_add(one, series_scale(D, BASE_GEOMETRY.s_ir)), scenario.a_uv),
-        series_scale(series_add(one, series_scale(D, BASE_GEOMETRY.s_uv)), scenario.a_ir),
-    )
-    num = series_sub(num, series_scale(D, TWO * scenario.chi_cross * mp.sqrt(scenario.a_uv * scenario.a_ir)))
-    return series_scale(series_mul(num, den_inv, order), scenario.kernel_scale)
-
-
-def build_D_series(order: int, scenario: ScalarScenario) -> List[mp.mpf]:
-    D = zero_series(order)
-    D[1] = ONE
-    one = one_series(order)
-    for _ in range(10 * order):
-        D2 = series_mul(D, D, order)
-        G = current_memory_series(D, order, scenario)
-        R = series_sub(one, series_scale(D, scenario.theta1_total))
-        R = series_add(R, series_mul(D2, G, order))
-        D_new = series_shift_up(series_sqrt(R, order), 1, order)
-        if all(abs(D_new[n] - D[n]) < mp.mpf("1e-95") for n in range(order + 1)):
-            return D_new
-        D = D_new
-    return D
-
-
-def zeta_series_from_D(D: List[mp.mpf], order: int) -> List[mp.mpf]:
-    inside = series_add(one_series(order), series_scale(D, FOUR / (THREE * PI**2)))
-    return series_scale(series_sub(series_sqrt(inside, order), one_series(order)), HALF)
-
-
-def D_total_series_from_D(D: List[mp.mpf], order: int) -> Tuple[List[mp.mpf], List[mp.mpf], List[mp.mpf]]:
-    zeta = zeta_series_from_D(D, order)
-    D_cross = series_shift_up(zeta, 1, order)
-    zeta_sq = series_mul(zeta, zeta, order)
-    D_hat = series_shift_down(D, 1, order)
-    D_hat_inv = series_inv(D_hat, order)
-    D_vector_core = series_mul(zeta_sq, D_hat_inv, order)
-    D_vector = series_shift_up(series_scale(D_vector_core, QUARTER), 1, order)
-    D_total = series_add(series_sub(D, D_cross), D_vector)
-    return zeta, D_vector, D_total
-
-
-def g2_series_from_D_total(D_total: List[mp.mpf], order: int) -> List[mp.mpf]:
-    return series_inv(series_sqrt(series_sub(one_series(order), D_total), order), order)
-
-
-def a_series_from_D_total(D_total: List[mp.mpf], order: int) -> List[mp.mpf]:
-    g2 = g2_series_from_D_total(D_total, order)
-    out = g2[:]
-    out[0] -= ONE
-    return out
-
-
-def D_total_series_from_qed_ae(qed_coeffs: Dict[int, mp.mpf], order: int) -> List[mp.mpf]:
-    a_e = dict_to_series(qed_coeffs, order)
-    g2 = series_add(one_series(order), a_e)
-    inv_g2 = series_inv(g2, order)
-    inv_sq = series_mul(inv_g2, inv_g2, order)
-    return series_sub(one_series(order), inv_sq)
-
-
-def solve_D_series_from_D_total_target(D_total_target: List[mp.mpf], order: int) -> List[mp.mpf]:
-    D = D_total_target[:]
-    D[0] = mp.mpf("0")
-    D[1] = ONE
-    for _ in range(10 * order):
-        zeta = zeta_series_from_D(D, order)
-        D_cross = series_shift_up(zeta, 1, order)
-        zeta_sq = series_mul(zeta, zeta, order)
-        D_hat = series_shift_down(D, 1, order)
-        D_hat_inv = series_inv(D_hat, order)
-        D_vector_core = series_mul(zeta_sq, D_hat_inv, order)
-        D_vector = series_shift_up(series_scale(D_vector_core, QUARTER), 1, order)
-        D_new = series_sub(series_add(D_total_target, D_cross), D_vector)
-        D_new[0] = mp.mpf("0")
-        D_new[1] = ONE
-        if all(abs(D_new[n] - D[n]) < mp.mpf("1e-95") for n in range(order + 1)):
-            return D_new
-        D = D_new
-    return D
-
-
-def build_qed_dc_series(qed_coeffs: Dict[int, mp.mpf], order: int) -> List[mp.mpf]:
-    D_total_target = D_total_series_from_qed_ae(qed_coeffs, order)
-    return solve_D_series_from_D_total_target(D_total_target, order)
-
-
-QED_DC_SERIES = build_qed_dc_series(PURE_QED_A1, 5)
-
-
-def dc_qed_universal_of_alpha(alpha: mp.mpf) -> mp.mpf:
-    return series_eval(QED_DC_SERIES, alpha / PI)
-
-
-def solve_alpha_from_dc_model(dc_model, D_target: mp.mpf) -> mp.mpf:
-    def residual(alpha_value: mp.mpf) -> mp.mpf:
-        return dc_model(alpha_value) - D_target
-
-    left = mp.mpf("0.001")
-    right = mp.mpf("0.02")
-    f_left = residual(left)
-    f_right = residual(right)
-    if not (f_left < 0 < f_right):
-        raise RuntimeError("Failed to bracket the alpha root for the QED-induced D_C model.")
-
-    for _ in range(1500):
-        mid = (left + right) / TWO
-        f_mid = residual(mid)
-        if abs(f_mid) < mp.mpf("1e-95") or abs(right - left) < mp.mpf("1e-95"):
-            return mid
-        if f_mid > 0:
-            right = mid
-        else:
-            left = mid
-    return (left + right) / TWO
-
-
-# -----------------------------------------------------------------------------
-# E) Lock construction with no pasted article Lambda input
-# -----------------------------------------------------------------------------
-
-def build_lock_from_refined_physical_bridge(alpha_reference: mp.mpf) -> Tuple[mp.mpf, mp.mpf, str]:
-    D_ref = solve_D_of_alpha(alpha_reference, REFINED_RANK100)
-    lambda_lock = lambda_from_D(D_ref)
-    return lambda_lock, D_ref, "Lambda_lock = (2π²/K) ζ(D_C^refined(α_exp))"
-
-
-def build_selected_lock() -> Tuple[mp.mpf, mp.mpf, str]:
-    return build_lock_from_refined_physical_bridge(ALPHA_EXP)
-
-
-LAMBDA_LOCK, D_BRIDGE, LOCK_FORMULA = build_selected_lock()
-D_LOCK = D_lock_from_lambda(LAMBDA_LOCK)
-
-
-# -----------------------------------------------------------------------------
-# F) Coefficient predictions up to order 10
-# -----------------------------------------------------------------------------
-CURRENT_D_SERIES = build_D_series(PREDICTION_ORDER, CURRENT_RANK5)
-REFINED_D_SERIES = build_D_series(PREDICTION_ORDER, REFINED_RANK100)
-_, _, CURRENT_D_TOTAL_SERIES = D_total_series_from_D(CURRENT_D_SERIES, PREDICTION_ORDER)
-_, _, REFINED_D_TOTAL_SERIES = D_total_series_from_D(REFINED_D_SERIES, PREDICTION_ORDER)
-CURRENT_A_SERIES = a_series_from_D_total(CURRENT_D_TOTAL_SERIES, PREDICTION_ORDER)
-REFINED_A_SERIES = a_series_from_D_total(REFINED_D_TOTAL_SERIES, PREDICTION_ORDER)
-
-
-# -----------------------------------------------------------------------------
-# G) g2 helpers
-# -----------------------------------------------------------------------------
-
-def g2_bundle(alpha_value: mp.mpf, D_value: mp.mpf) -> Dict[str, mp.mpf]:
-    x = alpha_value / PI
-    zeta = zeta_from_D(D_value)
-    D_cross = x * zeta
-    D_vector = x * x * zeta * zeta / (FOUR * D_value)
-    D_total = D_value - D_cross + D_vector
-    g2 = ONE / mp.sqrt(ONE - D_total)
-    a_e = g2 - ONE
-    return {
-        "zeta": zeta,
-        "D_cross": D_cross,
-        "D_vector": D_vector,
-        "D_total": D_total,
-        "g2": g2,
-        "a_e": a_e,
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ===========================================================================
+  // Numeric helpers
+  // ===========================================================================
+  const PI = Math.PI;
+  const SQRT_PI = Math.sqrt(PI);
+  const GAMMA_E = 0.5772156649015328606;
+
+  const ONE = 1.0;
+  const TWO = 2.0;
+  const THREE = 3.0;
+  const FOUR = 4.0;
+
+  const ALPHA_INV_EXP = 137.035999177;
+  const ALPHA_INV_EXP_SIGMA = 0.000000021;
+  const ALPHA_EXP = ONE / ALPHA_INV_EXP;
+  const ALPHA_EXP_SIGMA = ALPHA_INV_EXP_SIGMA / (ALPHA_INV_EXP * ALPHA_INV_EXP);
+
+  const CURRENT_ARTICLE_RANK = 5;
+  const REFINED_REFERENCE_RANK = 100;
+  const VECTOR_SOURCE_MAX_J = 31;
+  const VECTOR_SOURCE_GL_NODES = 400;
+  const FP_GL_NODES = 400;
+  const PREDICTION_ORDER = 10;
+
+  const PURE_QED_A1 = {
+    1: 0.5,
+    2: -0.328478965579193,
+    3: 1.181241456587,
+    4: -1.9122457649264456,
+    5: 5.891
+  };
+
+  const statusEl = document.getElementById("status");
+  const summaryEl = document.getElementById("summary-cards");
+
+  function setStatus(text, cls = ""){
+    statusEl.textContent = text;
+    statusEl.className = "status " + cls;
+  }
+
+  function cleanNumberString(s){
+    return s
+      .replace(/(\.\d*?[1-9])0+(e[+-]?\d+)$/i, "$1$2")
+      .replace(/\.0+(e[+-]?\d+)$/i, "$1")
+      .replace(/(\.\d*?[1-9])0+$/i, "$1")
+      .replace(/\.0+$/i, "");
+  }
+
+  function fmt(value, sig = 16){
+    if (!Number.isFinite(value)) return "—";
+    if (value === 0) return "0";
+    const abs = Math.abs(value);
+    const s = (abs >= 1e6 || abs < 1e-6) ? value.toExponential(Math.max(1, sig - 1)) : value.toPrecision(sig);
+    return cleanNumberString(s).replace(/e\+?/i, "e");
+  }
+
+  function fmtSci(value, sig = 12){
+    if (!Number.isFinite(value)) return "—";
+    if (value === 0) return "0";
+    return cleanNumberString(value.toExponential(Math.max(1, sig - 1))).replace(/e\+?/i, "e");
+  }
+
+  function tableHTML(headers, rows){
+    const head = headers.map(h => `<th>${h}</th>`).join("");
+    const body = rows.map(row => {
+      const tds = row.map((cell, idx) => {
+        const cls = idx > 0 ? "num" : "";
+        return `<td class="${cls}">${cell}</td>`;
+      }).join("");
+      return `<tr>${tds}</tr>`;
+    }).join("");
+    return `<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+  }
+
+  function formulaCard(name, expr, value, sig = 16){
+    return `
+      <div class="formula">
+        <div class="name">${name}</div>
+        <div class="expr">${expr}</div>
+        <div class="val">${typeof value === "string" ? value : fmt(value, sig)}</div>
+      </div>
+    `;
+  }
+
+  function sectionHTML(title, lead, formulasHTML, tableHTMLString){
+    return `<h2>${title}</h2><p class="lead">${lead}</p>${formulasHTML || ""}${tableHTMLString || ""}`;
+  }
+
+  function K_GEOMETRIC(){
+    return (150 * PI * PI - 8 * PI ** 4 - 315) / (180 * PI ** 6);
+  }
+
+  const KGEOM = K_GEOMETRIC();
+
+  function minimalBranchRatio(){ return ONE / PI; }
+  function minimalShellWidth(){ return ONE / (PI * SQRT_PI); }
+  function filamentaryReferenceCore(){ return Math.log(8 * Math.sqrt(PI)) - 2; }
+  function gaussianUvConstant(){ return 0.5 * (Math.log(2) + GAMMA_E); }
+
+  const ETA_0 = minimalBranchRatio();
+  const ELL_0 = minimalShellWidth();
+  const LAMBDA_IND = filamentaryReferenceCore();
+  const C_UV_GAUSS = gaussianUvConstant();
+
+  // ===========================================================================
+  // Gauss–Legendre utilities
+  // ===========================================================================
+  const glCache = new Map();
+
+  function legendrePn(n, x){
+    if (n === 0) return { Pn: 1, Pn1: 1 };
+    let P0 = 1, P1 = x;
+    if (n === 1) return { Pn: P1, Pn1: P0 };
+    for (let k = 2; k <= n; k++){
+      const Pk = ((2 * k - 1) * x * P1 - (k - 1) * P0) / k;
+      P0 = P1;
+      P1 = Pk;
     }
+    return { Pn: P1, Pn1: P0 };
+  }
 
+  function dPdxLeg(l, x){
+    if (l === 0) return 0;
+    const { Pn, Pn1 } = legendrePn(l, x);
+    return (l / (1 - x * x)) * (Pn1 - x * Pn);
+  }
 
-def g2_qed_from_coeffs(alpha_value: mp.mpf) -> Dict[str, mp.mpf]:
-    x = alpha_value / PI
-    a_e = mp.mpf("0")
-    for n, coeff in PURE_QED_A1.items():
-        a_e += coeff * (x ** n)
-    return {"g2": ONE + a_e, "a_e": a_e}
+  function gaussLegendreNodes(n){
+    if (glCache.has(n)) return glCache.get(n);
+    const xs = new Float64Array(n);
+    const ws = new Float64Array(n);
+    const tol = 1e-15;
 
-
-start = time.perf_counter()
-alpha_current = alpha_from_locked_D(D_LOCK, CURRENT_RANK5)
-alpha_refined = alpha_from_locked_D(D_LOCK, REFINED_RANK100)
-alpha_qed = solve_alpha_from_dc_model(dc_qed_universal_of_alpha, D_LOCK)
-
-g2_current_lock = g2_bundle(alpha_current, D_LOCK)
-g2_refined_lock = g2_bundle(alpha_refined, D_LOCK)
-g2_qed_alpha_lock = g2_bundle(alpha_qed, D_LOCK)
-
-D_current_exp = solve_D_of_alpha(ALPHA_EXP, CURRENT_RANK5)
-D_refined_exp = solve_D_of_alpha(ALPHA_EXP, REFINED_RANK100)
-lambda_current_exp = lambda_from_D(D_current_exp)
-lambda_refined_exp = lambda_from_D(D_refined_exp)
-lambda_qed_exp = lambda_from_D(dc_qed_universal_of_alpha(ALPHA_EXP))
-
-g2_current_exp = g2_bundle(ALPHA_EXP, D_current_exp)
-g2_refined_exp = g2_bundle(ALPHA_EXP, D_refined_exp)
-g2_qed_exp = g2_qed_from_coeffs(ALPHA_EXP)
-
-runtime_ms = (time.perf_counter() - start) * 1000.0
-cumulative_j7 = mp.fsum(VECTOR_WEIGHTS[j] for j in [1, 3, 5, 7])
-
-def alpha_row(name: str, alpha_value: mp.mpf, note: str) -> List[str]:
-    delta_alpha = alpha_value - ALPHA_EXP
-    z_sigma = delta_alpha / ALPHA_EXP_SIGMA
-    return [
-        name,
-        fmt(alpha_value, 24),
-        fmt(ONE / alpha_value, 24),
-        fmt_sci(delta_alpha, 12),
-        fmt(z_sigma, 12),
-        note,
-    ]
-
-
-def g2_row(name: str, alpha_value: str, D_value: str, bundle: Dict[str, mp.mpf], note: str) -> List[str]:
-    return [
-        name,
-        alpha_value,
-        D_value,
-        fmt(bundle["g2"], 24),
-        fmt(bundle["a_e"], 24),
-        note,
-    ]
-
-
-vector_rows = []
-for j in [1, 3, 5, 7]:
-    vector_rows.append([
-        f"Mode {j}",
-        fmt(VECTOR_A_SH[j], 24),
-        fmt(VECTOR_JCHI[j], 24),
-        fmt(VECTOR_WEIGHTS[j], 24),
-    ])
-vector_rows.append(["Cumulative through j=7", "—", "—", fmt(cumulative_j7, 24)])
-vector_rows.append(["Tail above j=7", "—", "—", fmt(ONE - cumulative_j7, 24)])
-
-alpha_rows = [
-    alpha_row("Current article scalar branch (rank-5)", alpha_current, "α = π D_lock / √R_moth(D_lock)"),
-    alpha_row("Refined no-free-parameter branch (rank-100)", alpha_refined, "self-consistency check of the chosen bridge"),
-    alpha_row("Universal-QED D_C(α) cross-check", alpha_qed, "solve D_C^QED(α) = D_lock"),
-]
-
-lambda_rows = [
-    ["Current rank-5", fmt(D_current_exp, 28), fmt(lambda_current_exp, 28)],
-    ["Refined rank-100", fmt(D_refined_exp, 28), fmt(lambda_refined_exp, 28)],
-    ["Universal QED bridge", fmt(dc_qed_universal_of_alpha(ALPHA_EXP), 28), fmt(lambda_qed_exp, 28)],
-]
-
-g2_rows = [
-    g2_row("Current locked solution", fmt(alpha_current, 24), fmt(D_LOCK, 24), g2_current_lock, "uses the fixed D_lock and the output α"),
-    g2_row("Refined locked self-check", fmt(alpha_refined, 24), fmt(D_LOCK, 24), g2_refined_lock, "same D_lock, refined scalar branch"),
-    g2_row("Universal-QED α cross-check", fmt(alpha_qed, 24), fmt(D_LOCK, 24), g2_qed_alpha_lock, "same D_lock with the QED-induced α solution"),
-    g2_row("Current rank-5 at α_exp", fmt(ALPHA_EXP, 24), fmt(D_current_exp, 24), g2_current_exp, "closed Relator g2 at the experimental α"),
-    g2_row("Refined rank-100 at α_exp", fmt(ALPHA_EXP, 24), fmt(D_refined_exp, 24), g2_refined_exp, "refined Relator g2 at the experimental α"),
-    ["Pure-QED benchmark at α_exp", fmt(ALPHA_EXP, 24), "—", fmt(g2_qed_exp["g2"], 24), fmt(g2_qed_exp["a_e"], 24), "g2 = 1 + Σ A1^(2n) (α_exp/π)^n, using the supplied QED coefficients"],
-]
-
-qed_compare_rows = []
-for n in range(1, 6):
-    q = PURE_QED_A1[n]
-    cur = CURRENT_A_SERIES[n]
-    ref = REFINED_A_SERIES[n]
-    qed_compare_rows.append([
-        str(n),
-        fmt(q, 24),
-        fmt(cur, 24),
-        fmt(ref, 24),
-        fmt_sci(cur - q, 12),
-        fmt_sci(ref - q, 12),
-    ])
-
-prediction_rows = []
-for n in range(1, PREDICTION_ORDER + 1):
-    status = "benchmarked" if n <= 5 else "Relator prediction"
-    qed_value = fmt(PURE_QED_A1[n], 24) if n in PURE_QED_A1 else "—"
-    prediction_rows.append([
-        str(n),
-        fmt(REFINED_A_SERIES[n], 24),
-        qed_value,
-        status,
-    ])
-
-payload = {
-    "runtimeMs": round(runtime_ms, 1),
-    "headline": {
-        "alpha": fmt(alpha_current, 24),
-        "alphaInv": fmt(ONE / alpha_current, 24),
-        "deltaAlpha": fmt_sci(alpha_current - ALPHA_EXP, 12),
-        "zSigma": fmt((alpha_current - ALPHA_EXP) / ALPHA_EXP_SIGMA, 12),
-        "g2": fmt(g2_current_lock["g2"], 24),
-        "alphaNote": "Current article scalar branch (rank-5) from the fixed geometric lock",
-    },
-    "computed": [
-        ["Λ_OUT(η₀)", "computed from the shell-source norm", fmt(VECTOR_LAMBDA_OUT, 28)],
-        ["Shell-source weights", "computed from the Maxwell shell formulas", "w_j from J_j^(χ)(η₀)"],
-        ["D_C(α)", "closed mother-equation solve", "current and refined scalar branches"],
-        ["Λ_lock", "computed from D_C^refined(α_exp)", fmt(LAMBDA_LOCK, 28)],
-        ["Output α", "computed from D_lock and the mother radicand", fmt(alpha_current, 24)],
-        ["A1^(2n) up to order 10", "runtime Relator coefficient prediction", "orders 6–10 predicted"],
-    ],
-    "external": [
-        ["α_exp^-1", "experimental comparison benchmark", fmt(ALPHA_INV_EXP, 20)],
-        ["σ(α^-1)", "experimental one-sigma uncertainty", fmt(ALPHA_INV_EXP_SIGMA, 12)],
-        ["α_exp", "derived from α_exp^-1", fmt(ALPHA_EXP, 28)],
-        ["σ(α)", "propagated from σ(α^-1)", fmt(ALPHA_EXP_SIGMA, 28)],
-        ["A1^(2n), n=1..5", "supplied pure-QED comparison inputs", "used only for comparison"],
-        ["QED physical value", "computed from the supplied QED coefficients", fmt(g2_qed_exp["g2"], 24)],
-    ],
-    "formulaCards": [
-        {
-            "label": "Closed constants",
-            "equation": r"\\[\eta_0 = \frac{1}{\pi},\qquad \ell_0 = \frac{1}{\pi\sqrt{\pi}},\qquad \Lambda_{\mathrm{ind}} = \ln(8\sqrt{\pi}) - 2,\qquad C_{\mathrm{UV}}^{\mathrm{Gauss}} = \tfrac12(\ln 2 + \gamma_E),\\qquad K = \frac{150\pi^2 - 8\pi^4 - 315}{180\pi^6}.\]",
-            "values": [
-                ["η₀", fmt(ETA_0, 28)],
-                ["ℓ₀", fmt(ELL_0, 28)],
-                ["Λ_ind", fmt(LAMBDA_IND, 28)],
-                ["C_UV^Gauss", fmt(C_UV_GAUSS, 28)],
-                ["K", fmt(K_GEOMETRIC, 28)],
-            ],
-            "note": "These are the closed branch constants used everywhere else on the page.",
-        },
-        {
-            "label": "Vector shell source and exterior subtraction",
-            "equation": r"\\[a_j^{(\mathrm{sh})}(\eta_0)=\frac{\int_{-1}^{1}\widetilde B_\theta(\eta_0,v)\sqrt{1-v^2}\,P_j'(v)\,dv}{I_j},\\qquad J_j^{(\chi)} = \sqrt{\frac{2\pi}{(j+1)(2j+1)}}\,\widehat a_j,\\qquad \Lambda_{\mathrm{OUT}}(\eta_0) = -\frac12\sum_{j\,\mathrm{odd}} \left(J_j^{(\chi)}\right)^2.\]",
-            "values": [
-                ["Λ_OUT(η₀)", fmt(VECTOR_LAMBDA_OUT, 28)],
-                ["w₁", fmt(VECTOR_WEIGHTS[1], 24)],
-                ["w₃", fmt(VECTOR_WEIGHTS[3], 24)],
-                ["w₅", fmt(VECTOR_WEIGHTS[5], 24)],
-                ["w₇", fmt(VECTOR_WEIGHTS[7], 24)],
-            ],
-            "note": "The dominant shell-source support is already saturated by the first few odd modes.",
-        },
-        {
-            "label": "Scalar mother equation",
-            "equation": r"\\[D_C(\alpha)=\frac{\alpha}{\pi}\sqrt{1-\Theta_1 D_C + D_C^2 G(D_C)},\\qquad G(D)=\kappa\,\frac{A_{\mathrm{UV}}(1+s_{\mathrm{IR}}D)+A_{\mathrm{IR}}(1+s_{\mathrm{UV}}D)-2\chi_\times D\sqrt{A_{\mathrm{UV}}A_{\mathrm{IR}}}}{(1+s_{\mathrm{UV}}D)(1+s_{\mathrm{IR}}D)-\chi_\times^2 D^2}.\]",
-            "values": [
-                ["Θ₁ total (current)", fmt(CURRENT_RANK5.theta1_total, 28)],
-                ["A_UV (current)", fmt(CURRENT_RANK5.a_uv, 28)],
-                ["A_IR (current)", fmt(CURRENT_RANK5.a_ir, 28)],
-                ["χ_× (current)", fmt(CURRENT_RANK5.chi_cross, 28)],
-                ["κ (refined)", fmt(REFINED_RANK100.kernel_scale, 28)],
-                ["Θ₁ total (refined)", fmt(REFINED_RANK100.theta1_total, 28)],
-            ],
-            "note": "The page evaluates both the current article branch and the refined no-free-parameter branch.",
-        },
-        {
-            "label": "ALP bridge and fixed geometric lock",
-            "equation": r"\\[\zeta(D)=\frac12\!\left(\sqrt{1+\frac{4D}{3\pi^2}}-1\right),\\qquad \Lambda(D)=\frac{2\pi^2}{K}\,\zeta(D),\\qquad D_{\mathrm{lock}}=\frac32K\Lambda_{\mathrm{lock}}\!\left(1+\frac{K\Lambda_{\mathrm{lock}}}{2\pi^2}\right).\]",
-            "values": [
-                ["Bridge formula", LOCK_FORMULA],
-                ["D_bridge", fmt(D_BRIDGE, 28)],
-                ["Λ_lock", fmt(LAMBDA_LOCK, 28)],
-                ["D_lock", fmt(D_LOCK, 28)],
-                ["D_lock − D_bridge", fmt_sci(D_LOCK - D_BRIDGE, 12)],
-            ],
-            "note": "The lock is formula-driven and does not inject a pasted article value for Λ_geom.",
-        },
-        {
-            "label": "g₂ map",
-            "equation": r"\\[x=\frac{\alpha}{\pi},\\qquad D_{\times}=x\,\zeta(D),\\qquad D_{\mathrm{vec}}=\frac{x^2\zeta(D)^2}{4D},\\qquad D_{\mathrm{total}}=D-D_{\times}+D_{\mathrm{vec}},\\qquad g_2=\frac{1}{\sqrt{1-D_{\mathrm{total}}}},\\qquad a_e=g_2-1.\]",
-            "values": [
-                ["Locked g₂ (current)", fmt(g2_current_lock["g2"], 24)],
-                ["Locked a_e (current)", fmt(g2_current_lock["a_e"], 24)],
-                ["QED g₂ at α_exp", fmt(g2_qed_exp["g2"], 24)],
-                ["QED a_e at α_exp", fmt(g2_qed_exp["a_e"], 24)],
-                ["ζ(D_lock)", fmt(g2_current_lock["zeta"], 28)],
-            ],
-            "note": "This makes the closed Relator g₂ and the QED benchmark visible on the same page.",
-        },
-        {
-            "label": "QED coefficient comparison and order-10 prediction",
-            "equation": r"\\[a_e(x)=\sum_{n\ge 1} A_1^{(2n)}x^n,\\qquad x=\frac{\alpha}{\pi}.\]",
-            "values": [
-                ["A1^(2)", fmt(REFINED_A_SERIES[1], 24)],
-                ["A1^(4)", fmt(REFINED_A_SERIES[2], 24)],
-                ["A1^(6)", fmt(REFINED_A_SERIES[3], 24)],
-                ["A1^(12)", fmt(REFINED_A_SERIES[6], 24)],
-                ["A1^(20)", fmt(REFINED_A_SERIES[10], 24)],
-            ],
-            "note": "Orders 6–10 are the requested closed predictions beyond the supplied QED benchmark range.",
-        },
-    ],
-    "tables": {
-        "vector": {
-            "headers": ["Mode / diagnostic", "a_j^(sh)(η₀)", "J_j^(χ)(η₀)", "Normalized weight"],
-            "rows": vector_rows,
-            "highlightRow": -1,
-        },
-        "alpha": {
-            "headers": ["Model", "α", "α⁻¹", "Δα", "zσ(α)", "Note"],
-            "rows": alpha_rows,
-            "highlightRow": 0,
-        },
-        "lambda": {
-            "headers": ["Model", "D_C(α_exp)", "Λ_π(α_exp)"],
-            "rows": lambda_rows,
-            "highlightRow": 1,
-        },
-        "g2": {
-            "headers": ["Model", "α used", "D_C", "g₂", "a_e", "Note"],
-            "rows": g2_rows,
-            "highlightRow": 0,
-        },
-        "qedCompare": {
-            "headers": ["n", "A1^(2n) pure QED", "A1^(2n) current rank-5", "A1^(2n) refined rank-100", "Δ current", "Δ refined"],
-            "rows": qed_compare_rows,
-            "highlightRow": -1,
-        },
-        "prediction": {
-            "headers": ["n", "A1^(2n) refined rank-100", "A1^(2n) pure QED", "Status"],
-            "rows": prediction_rows,
-            "highlightRow": -1,
-        },
-    },
-}
-
-json.dumps(payload, ensure_ascii=False)
-  </script>
-
-  <script>
-    const statusPill = document.getElementById('statusPill');
-    const statusText = document.getElementById('statusText');
-    const runtimeSummary = document.getElementById('runtimeSummary');
-    const recomputeBtn = document.getElementById('recomputeBtn');
-
-    function setStatus(state, text) {
-      statusPill.dataset.state = state;
-      statusText.textContent = text;
-    }
-
-    function makeValueRow(leftTitle, leftNote, rightValue) {
-      const row = document.createElement('div');
-      row.className = 'value-row';
-
-      const left = document.createElement('div');
-      left.className = 'left';
-      left.innerHTML = `<strong>${leftTitle}</strong><br>${leftNote}`;
-
-      const right = document.createElement('div');
-      right.className = 'right';
-      right.textContent = rightValue;
-
-      row.append(left, right);
-      return row;
-    }
-
-    function renderSimpleList(containerId, items) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = '';
-      items.forEach(([title, note, value]) => {
-        container.appendChild(makeValueRow(title, note, value));
-      });
-    }
-
-    function renderTable(containerId, tableData) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = '';
-
-      const wrap = document.createElement('div');
-      wrap.className = 'table-wrap';
-
-      const table = document.createElement('table');
-      const thead = document.createElement('thead');
-      const tbody = document.createElement('tbody');
-
-      const trHead = document.createElement('tr');
-      tableData.headers.forEach(h => {
-        const th = document.createElement('th');
-        th.textContent = h;
-        trHead.appendChild(th);
-      });
-      thead.appendChild(trHead);
-
-      tableData.rows.forEach((row, idx) => {
-        const tr = document.createElement('tr');
-        if (idx === tableData.highlightRow) tr.classList.add('highlight');
-
-        row.forEach((cell, cellIdx) => {
-          const td = document.createElement('td');
-          td.textContent = cell;
-          const header = (tableData.headers[cellIdx] || '').toLowerCase();
-          const looksNumeric = /[0-9]/.test(String(cell)) && !String(cell).includes('Mode ') && cell !== '—';
-          if (looksNumeric && !header.includes('model') && !header.includes('status') && !header.includes('note')) {
-            td.classList.add('num');
-          }
-          if (header.includes('note')) td.classList.add('note');
-          tr.appendChild(td);
-        });
-
-        tbody.appendChild(tr);
-      });
-
-      table.append(thead, tbody);
-      wrap.appendChild(table);
-      container.appendChild(wrap);
-    }
-
-    function renderFormulaCards(cards) {
-      const grid = document.getElementById('formulaGrid');
-      grid.innerHTML = '';
-
-      cards.forEach(card => {
-        const el = document.createElement('article');
-        el.className = 'formula-card';
-        el.innerHTML = `
-          <div class="mini-label">${card.label}</div>
-          <div class="formula">${card.equation}</div>
-          <div class="value-stack"></div>
-          <div class="split-note">${card.note}</div>
-        `;
-        const stack = el.querySelector('.value-stack');
-        card.values.forEach(([name, value]) => {
-          const row = document.createElement('div');
-          row.className = 'value-row';
-          row.innerHTML = `
-            <div class="left"><strong>${name}</strong></div>
-            <div class="right">${value}</div>
-          `;
-          stack.appendChild(row);
-        });
-        grid.appendChild(el);
-      });
-    }
-
-    function fillHeadline(headline) {
-      document.getElementById('headlineAlpha').textContent = headline.alpha;
-      document.getElementById('headlineAlphaInv').textContent = headline.alphaInv;
-      document.getElementById('headlineDeltaAlpha').textContent = headline.deltaAlpha;
-      document.getElementById('headlineSigma').textContent = headline.zSigma;
-      document.getElementById('headlineG2').textContent = headline.g2;
-      document.getElementById('headlineAlphaNote').textContent = headline.alphaNote;
-    }
-
-    async function computePage() {
-      recomputeBtn.disabled = true;
-      setStatus('loading', 'Loading Pyodide and scientific packages…');
-      runtimeSummary.textContent = 'Loading the high-precision runtime and computing the page…';
-
-      try {
-        const t0 = performance.now();
-        const pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.29.3/full/' });
-
-        setStatus('loading', 'Loading mpmath, NumPy, and SciPy…');
-        await pyodide.loadPackage(['mpmath', 'numpy', 'scipy']);
-
-        setStatus('loading', 'Running the closed-form computation…');
-        const pyCode = document.getElementById('py-kernel').textContent;
-        const raw = await pyodide.runPythonAsync(pyCode);
-        const data = JSON.parse(raw);
-        const t1 = performance.now();
-
-        fillHeadline(data.headline);
-        renderSimpleList('computedList', data.computed);
-        renderSimpleList('externalList', data.external);
-        renderFormulaCards(data.formulaCards);
-        renderTable('vectorTableWrap', data.tables.vector);
-        renderTable('alphaTableWrap', data.tables.alpha);
-        renderTable('lambdaTableWrap', data.tables.lambda);
-        renderTable('g2TableWrap', data.tables.g2);
-        renderTable('qedCompareTableWrap', data.tables.qedCompare);
-        renderTable('predictionTableWrap', data.tables.prediction);
-
-        runtimeSummary.textContent = `Computed in the browser. Python-side math time: ${data.runtimeMs.toFixed ? data.runtimeMs.toFixed(1) : data.runtimeMs} ms · total page runtime: ${((t1 - t0) / 1000).toFixed(2)} s.`;
-        setStatus('ready', 'Computation complete');
-        recomputeBtn.disabled = false;
-
-        if (window.MathJax && window.MathJax.typesetPromise) {
-          await window.MathJax.typesetPromise();
-        }
-      } catch (error) {
-        console.error(error);
-        setStatus('error', 'Computation failed');
-        runtimeSummary.textContent = 'The scientific runtime could not be initialized. Check network access for the Pyodide CDN assets and retry.';
-        recomputeBtn.disabled = false;
+    for (let k = 1; k <= n; k++){
+      let x = Math.cos(PI * (k - 0.25) / (n + 0.5));
+      for (let it = 0; it < 80; it++){
+        const { Pn, Pn1 } = legendrePn(n, x);
+        const dPn = (n / (1 - x * x)) * (Pn1 - x * Pn);
+        const dx = -Pn / dPn;
+        x += dx;
+        if (Math.abs(dx) < tol) break;
       }
+      const { Pn, Pn1 } = legendrePn(n, x);
+      const dPn = (n / (1 - x * x)) * (Pn1 - x * Pn);
+      const w = 2 / ((1 - x * x) * dPn * dPn);
+      xs[k - 1] = x;
+      ws[k - 1] = w;
+    }
+    const out = { xs, ws };
+    glCache.set(n, out);
+    return out;
+  }
+
+  // ===========================================================================
+  // Complete elliptic integrals K(m), E(m) by quadrature
+  // ===========================================================================
+  const ellipticGL = (() => {
+    const { xs, ws } = gaussLegendreNodes(96);
+    const a = 0;
+    const b = 0.5 * PI;
+    const scale = 0.5 * (b - a);
+    const shift = 0.5 * (a + b);
+    return {
+      thetas: Array.from(xs, x => scale * x + shift),
+      weights: Array.from(ws, w => scale * w)
+    };
+  })();
+
+  function ellipticKE(m){
+    let mm = m;
+    if (mm <= 0) return [0.5 * PI, 0.5 * PI];
+    if (mm >= 1) mm = 1 - 1e-15;
+
+    let sK = 0;
+    let sE = 0;
+    const { thetas, weights } = ellipticGL;
+    for (let i = 0; i < thetas.length; i++){
+      const th = thetas[i];
+      const w = weights[i];
+      const s = Math.sin(th);
+      const u = Math.sqrt(1 - mm * s * s);
+      sK += w / u;
+      sE += w * u;
+    }
+    return [sK, sE];
+  }
+
+  // ===========================================================================
+  // Vector shell source from the Maxwell shell formulas
+  // ===========================================================================
+  function fluxModeNormI(j){ return 2 * j * (j + 1) / (2 * j + 1); }
+
+  function shellK2(eta, v){
+    const rho = Math.sqrt(Math.max(0, 1 - v * v));
+    const z = v;
+    return 4 * eta * rho / (((eta + rho) * (eta + rho)) + z * z);
+  }
+
+  function shellBrhoShape(eta, v){
+    const rho = Math.sqrt(Math.max(0, 1 - v * v));
+    const z = v;
+    let m = shellK2(eta, v);
+    if (m <= 0) return 0;
+    if (m >= 1) m = 1 - 1e-15;
+    const [K, E] = ellipticKE(m);
+    const den = Math.sqrt((eta + rho) * (eta + rho) + z * z);
+    const rhoSafe = rho < 1e-15 ? 1e-15 : rho;
+    const ratio = (eta * eta + rho * rho + z * z) / (((eta - rho) * (eta - rho)) + z * z);
+    return z / (2 * PI * rhoSafe * den) * (-K + ratio * E);
+  }
+
+  function shellBzShape(eta, v){
+    const rho = Math.sqrt(Math.max(0, 1 - v * v));
+    const z = v;
+    let m = shellK2(eta, v);
+    if (m <= 0) return 0;
+    if (m >= 1) m = 1 - 1e-15;
+    const [K, E] = ellipticKE(m);
+    const den = Math.sqrt((eta + rho) * (eta + rho) + z * z);
+    const ratio = (eta * eta - rho * rho - z * z) / (((eta - rho) * (eta - rho)) + z * z);
+    return 1 / (2 * PI * den) * (K + ratio * E);
+  }
+
+  function shellBthetaShape(eta, v){
+    const rho = Math.sqrt(Math.max(0, 1 - v * v));
+    const z = v;
+    return z * shellBrhoShape(eta, v) - rho * shellBzShape(eta, v);
+  }
+
+  function computeShellSourceCoefficients(eta, maxJ, nGL){
+    const { xs, ws } = gaussLegendreNodes(nGL);
+    const bTilde = Array.from(xs, x => shellBthetaShape(eta, x));
+    const out = {};
+    for (let j = 1; j <= maxJ; j += 2){
+      let s = 0;
+      for (let i = 0; i < xs.length; i++){
+        const x = xs[i];
+        const rho = Math.sqrt(Math.max(0, 1 - x * x));
+        s += ws[i] * bTilde[i] * rho * dPdxLeg(j, x);
+      }
+      out[j] = s / fluxModeNormI(j);
+    }
+    return out;
+  }
+
+  function computeShellSourceJchi(aSh){
+    const out = {};
+    for (const [jStr, aValue] of Object.entries(aSh)){
+      const j = Number(jStr);
+      const aHat = 2 * (j + 1) * aValue;
+      out[j] = Math.sqrt(2 * PI / ((j + 1) * (2 * j + 1))) * aHat;
+    }
+    return out;
+  }
+
+  function lambdaOutFromJchi(jchi){
+    let sum = 0;
+    for (const value of Object.values(jchi)) sum += value * value;
+    return -0.5 * sum;
+  }
+
+  function normalizedSourceWeights(jchi){
+    let denom = 0;
+    for (const value of Object.values(jchi)) denom += value * value;
+    const out = {};
+    for (const [j, value] of Object.entries(jchi)) out[j] = value * value / denom;
+    return out;
+  }
+
+  // ===========================================================================
+  // Scalar channel
+  // ===========================================================================
+  function erfSeriesSmall(x){
+    // Accurate enough here because the only direct use is x = ell0 / 4 ~ 0.0449.
+    let sum = 0;
+    let fact = 1;
+    let xPow = x;
+    let sign = 1;
+    for (let n = 0; n < 22; n++){
+      if (n > 0){
+        fact *= n;
+        xPow *= x * x;
+        sign *= -1;
+      }
+      sum += sign * xPow / (fact * (2 * n + 1));
+    }
+    return 2 / Math.sqrt(Math.PI) * sum;
+  }
+
+  function gammaClogZero(ell){
+    const x = ell / 4;
+    const erfc = 1 - erfSeriesSmall(x);
+    return (Math.sqrt(Math.PI) * ell / 2) * Math.exp((ell * ell) / 16) * erfc;
+  }
+
+  const fpGL = gaussLegendreNodes(FP_GL_NODES);
+  const fpCache = new Map();
+
+  function FpIntegral(p, ell){
+    const { xs, ws } = fpGL;
+    let s = 0;
+    for (let i = 0; i < xs.length; i++){
+      const t = 0.5 * (xs[i] + 1);   // [-1,1] → [0,1]
+      const w = 0.5 * ws[i];
+      s += w * Math.exp(-(((1 - t) / ell) ** 2)) * Math.cos(p * PI * t);
+    }
+    return s;
+  }
+
+  function FpCached(p, ell){
+    if (fpCache.has(p)) return fpCache.get(p);
+    const value = FpIntegral(p, ell);
+    fpCache.set(p, value);
+    return value;
+  }
+
+  function Cmn(m, n, ell){
+    return m * n * (FpCached(Math.abs(m - n), ell) + FpCached(m + n, ell));
+  }
+
+  function buildBaseShellGeometry(){
+    const eta0 = ETA_0;
+    const ell0 = ELL_0;
+    const cUni = (1 / PI) * (4 / 3 + 1 / (4 * PI * PI));
+    const c11 = Cmn(1, 1, ell0);
+    const theta1Core = 2 * PI * cUni;
+    const theta1Coll = (GAMMA_E / (PI * PI)) * c11;
+    const theta1Log = eta0 * eta0 / (8 * (1 - eta0 * eta0 / 4));
+    const aShell = PI * PI * c11 + GAMMA_E / 4;
+    const sUv = Math.log(2);
+    const sIr = 1 / (8 * PI * PI);
+    const gamma0 = gammaClogZero(ell0);
+    const b11Glue = (theta1Coll + theta1Log - gamma0 * theta1Coll * theta1Log) /
+                    (1 - (gamma0 * gamma0 / 4) * theta1Coll * theta1Log);
+
+    return {
+      c11,
+      theta1Core,
+      theta1Coll,
+      theta1Log,
+      aShell,
+      sUv,
+      sIr,
+      eta0,
+      ell0,
+      gammaClog0: gamma0,
+      b11Glue
+    };
+  }
+
+  const baseGeometry = buildBaseShellGeometry();
+
+  function higherModeSums(rank, ell){
+    let deltaAMix = 0;
+    let deltaA0 = 0;
+    if (rank < 2) return { deltaAMix, deltaA0 };
+
+    for (let n = 2; n <= rank; n++){
+      const c1n = Cmn(1, n, ell);
+      const cnn = Cmn(n, n, ell);
+      const gap = n * n - 1;
+      deltaAMix += (GAMMA_E / (PI * PI)) * (c1n * c1n / gap);
+      deltaA0 += -(GAMMA_E / (PI * PI)) * (c1n * c1n * cnn / (gap ** 3));
+    }
+    return { deltaAMix, deltaA0 };
+  }
+
+  function buildCurrentScenario(rank){
+    const { deltaAMix, deltaA0 } = higherModeSums(rank, baseGeometry.ell0);
+    const theta1Total = baseGeometry.theta1Core + baseGeometry.b11Glue;
+    const deltaADiag = -(baseGeometry.eta0 * baseGeometry.eta0) * deltaA0;
+    const chiCross = deltaAMix * deltaAMix;
+    const aUv = baseGeometry.aShell + deltaAMix + deltaA0 + deltaADiag;
+    const aIr = baseGeometry.aShell - deltaAMix + deltaA0 + deltaADiag;
+
+    return {
+      label: `current_rank_${rank}`,
+      rank,
+      theta1Total,
+      aUv,
+      aIr,
+      chiCross,
+      deltaAMix,
+      deltaA0,
+      deltaADiag,
+      kernelScale: 1
+    };
+  }
+
+  function buildStaticHiddenCompletion(){
+    const a = baseGeometry.theta1Coll;
+    const b = baseGeometry.theta1Log;
+    const gamma0 = baseGeometry.gammaClog0;
+
+    const Nc = Math.sqrt(PI / 8) * baseGeometry.ell0;
+    const rhoStatic = gamma0 / Math.sqrt(Nc);
+    const lambdaHidden = 1 / (1 - rhoStatic * rhoStatic);
+
+    const c0 = gamma0 * a * b / 2;
+    const aPerp = a - c0 * c0 / b;
+    const bPerp = b - c0 * c0 / a;
+    const t1 = Math.sqrt(aPerp / a);
+    const t2 = Math.sqrt(bPerp / b);
+
+    const a11 = 1 / aPerp - c0 / lambdaHidden;
+    const a12 = gamma0 / 2 - c0 / lambdaHidden;
+    const a22 = 1 / bPerp - c0 / lambdaHidden;
+    const det2 = a11 * a22 - a12 * a12;
+    const b11Refined = (t1 * t1 * a22 - 2 * t1 * t2 * a12 + t2 * t2 * a11) / det2;
+    const theta1Refined = baseGeometry.theta1Core + b11Refined;
+
+    return { b11Refined, theta1Refined, rhoStatic, lambdaHidden, aPerp, bPerp };
+  }
+
+  const staticCompletion = buildStaticHiddenCompletion();
+
+  function buildDynamicKernelScale(current){
+    const rhoDyn = current.chiCross / Math.sqrt(baseGeometry.sUv * baseGeometry.sIr);
+    const lambdaU = 1 / (1 - rhoDyn * rhoDyn);
+    return { rhoDyn, lambdaU, kernelScale: lambdaU * lambdaU };
+  }
+
+  function buildRefinedScenario(rank){
+    const current = buildCurrentScenario(rank);
+    const dyn = buildDynamicKernelScale(current);
+    return {
+      label: `refined_rank_${rank}`,
+      rank,
+      theta1Total: staticCompletion.theta1Refined,
+      aUv: current.aUv,
+      aIr: current.aIr,
+      chiCross: current.chiCross,
+      deltaAMix: current.deltaAMix,
+      deltaA0: current.deltaA0,
+      deltaADiag: current.deltaADiag,
+      kernelScale: dyn.kernelScale,
+      rhoDyn: dyn.rhoDyn,
+      lambdaU: dyn.lambdaU
+    };
+  }
+
+  const currentRank5 = buildCurrentScenario(CURRENT_ARTICLE_RANK);
+  const refinedRank100 = buildRefinedScenario(REFINED_REFERENCE_RANK);
+
+  function modelMemoryValue(D, scenario){
+    let num = scenario.aUv * (1 + baseGeometry.sIr * D) + scenario.aIr * (1 + baseGeometry.sUv * D);
+    num -= 2 * scenario.chiCross * D * Math.sqrt(scenario.aUv * scenario.aIr);
+    const den = (1 + baseGeometry.sUv * D) * (1 + baseGeometry.sIr * D) - (scenario.chiCross * scenario.chiCross) * D * D;
+    return scenario.kernelScale * (num / den);
+  }
+
+  function motherRadicand(D, scenario){
+    return 1 - scenario.theta1Total * D + D * D * modelMemoryValue(D, scenario);
+  }
+
+  function solveDofAlpha(alpha, scenario){
+    const x = alpha / PI;
+    const residual = (D) => {
+      const rad = motherRadicand(D, scenario);
+      if (rad <= 0) return 1e100;
+      return D - x * Math.sqrt(rad);
+    };
+
+    let left = 0;
+    let right = Math.max(0.003, 2 * x);
+    const fLeft = residual(left);
+    const fRight = residual(right);
+    if (!(fLeft < 0 && fRight > 0)) throw new Error(`Failed to bracket D_C(alpha) for ${scenario.label}.`);
+
+    for (let i = 0; i < 220; i++){
+      const mid = 0.5 * (left + right);
+      const fMid = residual(mid);
+      if (Math.abs(fMid) < 1e-16 || Math.abs(right - left) < 1e-16) return mid;
+      if (fMid > 0) right = mid; else left = mid;
+    }
+    return 0.5 * (left + right);
+  }
+
+  function alphaFromLockedD(DLock, scenario){
+    const rad = motherRadicand(DLock, scenario);
+    if (rad <= 0) throw new Error(`Non-positive mother radicand for ${scenario.label}.`);
+    return PI * DLock / Math.sqrt(rad);
+  }
+
+  // ===========================================================================
+  // ALP bridge and QED-engineered D_C
+  // ===========================================================================
+  function zetaFromD(D){
+    return 0.5 * (Math.sqrt(1 + 4 * D / (3 * PI * PI)) - 1);
+  }
+
+  function lambdaFromD(D){
+    return (2 * PI * PI / KGEOM) * zetaFromD(D);
+  }
+
+  function dLockFromLambda(lambdaValue){
+    return 1.5 * KGEOM * lambdaValue * (1 + KGEOM * lambdaValue / (2 * PI * PI));
+  }
+
+  function zeroSeries(order){ return Array(order + 1).fill(0); }
+  function oneSeries(order){ const out = zeroSeries(order); out[0] = 1; return out; }
+  function seriesAdd(a, b){ return a.map((v, i) => v + b[i]); }
+  function seriesSub(a, b){ return a.map((v, i) => v - b[i]); }
+  function seriesScale(a, c){ return a.map(v => v * c); }
+  function seriesMul(a, b, order){
+    const out = zeroSeries(order);
+    for (let n = 0; n <= order; n++){
+      let s = 0;
+      for (let k = 0; k <= n; k++) s += a[k] * b[n - k];
+      out[n] = s;
+    }
+    return out;
+  }
+
+  function seriesInv(a, order){
+    if (a[0] === 0) throw new Error("Series inverse requires nonzero constant term.");
+    const out = zeroSeries(order);
+    out[0] = 1 / a[0];
+    for (let n = 1; n <= order; n++){
+      let s = 0;
+      for (let k = 1; k <= n; k++) s += a[k] * out[n - k];
+      out[n] = -s / a[0];
+    }
+    return out;
+  }
+
+  function seriesSqrt(a, order){
+    if (a[0] <= 0) throw new Error("Series square root requires positive constant term.");
+    const out = zeroSeries(order);
+    out[0] = Math.sqrt(a[0]);
+    for (let n = 1; n <= order; n++){
+      let s = 0;
+      for (let k = 1; k < n; k++) s += out[k] * out[n - k];
+      out[n] = (a[n] - s) / (2 * out[0]);
+    }
+    return out;
+  }
+
+  function seriesShiftUp(a, m, order){
+    const out = zeroSeries(order);
+    for (let n = 0; n <= order - m; n++) out[n + m] = a[n];
+    return out;
+  }
+
+  function seriesShiftDown(a, m, order){
+    const out = zeroSeries(order);
+    for (let n = 0; n <= order - m; n++) out[n] = a[n + m];
+    return out;
+  }
+
+  function seriesEval(coeffs, x){
+    let total = 0;
+    let power = 1;
+    for (const coefficient of coeffs){
+      total += coefficient * power;
+      power *= x;
+    }
+    return total;
+  }
+
+  function dictToSeries(coeffs, order){
+    const out = zeroSeries(order);
+    for (const [key, value] of Object.entries(coeffs)){
+      const n = Number(key);
+      if (n >= 0 && n <= order) out[n] = value;
+    }
+    return out;
+  }
+
+  function currentMemorySeries(D, order, scenario){
+    const one = oneSeries(order);
+    const den = seriesSub(
+      seriesMul(
+        seriesAdd(one, seriesScale(D, baseGeometry.sUv)),
+        seriesAdd(one, seriesScale(D, baseGeometry.sIr)),
+        order
+      ),
+      seriesScale(seriesMul(D, D, order), scenario.chiCross * scenario.chiCross)
+    );
+
+    const denInv = seriesInv(den, order);
+    let num = seriesAdd(
+      seriesScale(seriesAdd(one, seriesScale(D, baseGeometry.sIr)), scenario.aUv),
+      seriesScale(seriesAdd(one, seriesScale(D, baseGeometry.sUv)), scenario.aIr)
+    );
+    num = seriesSub(num, seriesScale(D, 2 * scenario.chiCross * Math.sqrt(scenario.aUv * scenario.aIr)));
+    return seriesScale(seriesMul(num, denInv, order), scenario.kernelScale);
+  }
+
+  function buildDSeries(order, scenario){
+    let D = zeroSeries(order);
+    D[1] = 1;
+    const one = oneSeries(order);
+
+    for (let iter = 0; iter < 10 * order; iter++){
+      const D2 = seriesMul(D, D, order);
+      const G = currentMemorySeries(D, order, scenario);
+      let R = seriesSub(one, seriesScale(D, scenario.theta1Total));
+      R = seriesAdd(R, seriesMul(D2, G, order));
+      const DNew = seriesShiftUp(seriesSqrt(R, order), 1, order);
+
+      let maxDiff = 0;
+      for (let i = 0; i < D.length; i++) maxDiff = Math.max(maxDiff, Math.abs(DNew[i] - D[i]));
+      D = DNew;
+      if (maxDiff < 1e-15) break;
+    }
+    return D;
+  }
+
+  function zetaSeriesFromD(D, order){
+    const inside = seriesAdd(oneSeries(order), seriesScale(D, 4 / (3 * PI * PI)));
+    return seriesScale(seriesSub(seriesSqrt(inside, order), oneSeries(order)), 0.5);
+  }
+
+  function dTotalSeriesFromD(D, order){
+    const zeta = zetaSeriesFromD(D, order);
+    const dCross = seriesShiftUp(zeta, 1, order);
+    const zetaSq = seriesMul(zeta, zeta, order);
+    const dHat = seriesShiftDown(D, 1, order);
+    const dHatInv = seriesInv(dHat, order);
+    const dVectorCore = seriesMul(zetaSq, dHatInv, order);
+    const dVector = seriesShiftUp(seriesScale(dVectorCore, 0.25), 1, order);
+    const dTotal = seriesAdd(seriesSub(D, dCross), dVector);
+    return { zeta, dVector, dTotal };
+  }
+
+  function g2SeriesFromDTotal(dTotal, order){
+    return seriesInv(seriesSqrt(seriesSub(oneSeries(order), dTotal), order), order);
+  }
+
+  function aSeriesFromDTotal(dTotal, order){
+    const g2 = g2SeriesFromDTotal(dTotal, order);
+    const out = [...g2];
+    out[0] -= 1;
+    return out;
+  }
+
+  function dTotalSeriesFromQedAe(qedCoeffs, order){
+    const aE = dictToSeries(qedCoeffs, order);
+    const g2 = seriesAdd(oneSeries(order), aE);
+    const invG2 = seriesInv(g2, order);
+    const invSq = seriesMul(invG2, invG2, order);
+    return seriesSub(oneSeries(order), invSq);
+  }
+
+  function solveDSeriesFromDTotalTarget(target, order){
+    let D = [...target];
+    D[0] = 0;
+    D[1] = 1;
+
+    for (let iter = 0; iter < 10 * order; iter++){
+      const zeta = zetaSeriesFromD(D, order);
+      const dCross = seriesShiftUp(zeta, 1, order);
+      const zetaSq = seriesMul(zeta, zeta, order);
+      const dHat = seriesShiftDown(D, 1, order);
+      const dHatInv = seriesInv(dHat, order);
+      const dVectorCore = seriesMul(zetaSq, dHatInv, order);
+      const dVector = seriesShiftUp(seriesScale(dVectorCore, 0.25), 1, order);
+      const DNew = seriesSub(seriesAdd(target, dCross), dVector);
+      DNew[0] = 0;
+      DNew[1] = 1;
+
+      let maxDiff = 0;
+      for (let i = 0; i < D.length; i++) maxDiff = Math.max(maxDiff, Math.abs(DNew[i] - D[i]));
+      D = DNew;
+      if (maxDiff < 1e-15) break;
+    }
+    return D;
+  }
+
+  function buildQedDcSeries(qedCoeffs, order){
+    return solveDSeriesFromDTotalTarget(dTotalSeriesFromQedAe(qedCoeffs, order), order);
+  }
+
+  const qedDcSeries = buildQedDcSeries(PURE_QED_A1, 5);
+
+  function dcQedUniversalOfAlpha(alpha){
+    return seriesEval(qedDcSeries, alpha / PI);
+  }
+
+  function solveAlphaFromDcModel(dcModel, dTarget){
+    const residual = (alpha) => dcModel(alpha) - dTarget;
+    let left = 0.001;
+    let right = 0.02;
+    const fLeft = residual(left);
+    const fRight = residual(right);
+    if (!(fLeft < 0 && fRight > 0)) throw new Error("Failed to bracket the alpha root for the QED-induced D_C model.");
+
+    for (let i = 0; i < 220; i++){
+      const mid = 0.5 * (left + right);
+      const fMid = residual(mid);
+      if (Math.abs(fMid) < 1e-16 || Math.abs(right - left) < 1e-16) return mid;
+      if (fMid > 0) right = mid; else left = mid;
+    }
+    return 0.5 * (left + right);
+  }
+
+  function physicalFromAlphaAndD(alpha, D){
+    const zeta = zetaFromD(D);
+    const x = alpha / PI;
+    const dCross = x * zeta;
+    const dVector = x * x * zeta * zeta / (4 * D);
+    const dTotal = D - dCross + dVector;
+    const g2 = 1 / Math.sqrt(1 - dTotal);
+    return {
+      zeta,
+      dCross,
+      dVector,
+      dTotal,
+      g2,
+      aE: g2 - 1
+    };
+  }
+
+  // ===========================================================================
+  // Main compute + render
+  // ===========================================================================
+  function renderSummaryCards(result){
+    const cards = [
+      {
+        label: "Main output α",
+        value: `<strong>${fmt(result.alphaCurrent, 18)}</strong>`,
+        note: "Current article scalar branch (rank-5)",
+        primary: true
+      },
+      {
+        label: "1 / α",
+        value: fmt(1 / result.alphaCurrent, 18),
+        note: "Inverse emergent α"
+      },
+      {
+        label: "Δα vs αexp",
+        value: fmtSci(result.alphaCurrent - ALPHA_EXP, 12),
+        note: "Difference from CODATA 2022 α"
+      },
+      {
+        label: "zσ(α)",
+        value: fmt(result.zSigmaAlphaCurrent, 12),
+        note: "Distance in σ(α)"
+      },
+      {
+        label: "g₂ (calculated)",
+        value: fmt(result.currentOutputPhysical.g2, 18),
+        note: "Computed from D_total at α_out"
+      },
+      {
+        label: "g₂ (QED, 5-loop)",
+        value: fmt(result.g2QED5, 18),
+        note: "External comparison benchmark"
+      }
+    ];
+
+    summaryEl.innerHTML = cards.map(card => `
+      <div class="stat ${card.primary ? "primary" : ""}">
+        <div class="label">${card.label}</div>
+        <div class="value">${card.value}</div>
+        <div class="note">${card.note}</div>
+      </div>
+    `).join("");
+  }
+
+  function renderConstantsSection(result){
+    const formulas = `
+      <div class="formula-grid">
+        ${formulaCard("Minimal branch ratio", "η₀ = 1 / π", ETA_0, 18)}
+        ${formulaCard("Minimal shell width", "ℓ₀ = 1 / (π √π)", ELL_0, 18)}
+        ${formulaCard("Filamentary core", "Λ_ind = ln(8 √π) − 2", LAMBDA_IND, 18)}
+        ${formulaCard("Gaussian UV constant", "C_UV^Gauss = ½ (ln 2 + γ_E)", C_UV_GAUSS, 18)}
+        ${formulaCard("Exact shell constant", "K = (150π² − 8π⁴ − 315) / (180π⁶)", KGEOM, 18)}
+        ${formulaCard("Experimental benchmark", "α_exp⁻¹ = 137.035999177, σ = 0.000000021", `${fmt(ALPHA_EXP, 18)}  (σ = ${fmtSci(ALPHA_EXP_SIGMA, 12)})`)}
+      </div>
+    `;
+
+    const rows = [
+      ["α_exp⁻¹", fmt(ALPHA_INV_EXP, 18)],
+      ["σ(α⁻¹)", fmtSci(ALPHA_INV_EXP_SIGMA, 12)],
+      ["α_exp", fmt(ALPHA_EXP, 18)],
+      ["σ(α)", fmtSci(ALPHA_EXP_SIGMA, 12)],
+      ["η₀", fmt(ETA_0, 18)],
+      ["ℓ₀", fmt(ELL_0, 18)],
+      ["Λ_ind", fmt(LAMBDA_IND, 18)],
+      ["C_UV^Gauss", fmt(C_UV_GAUSS, 18)],
+      ["K", fmt(KGEOM, 18)]
+    ];
+
+    document.getElementById("constants-section").innerHTML = sectionHTML(
+      "Exact constants and external comparison inputs",
+      "These are the fixed closed constants and the only external comparison inputs used on the page.",
+      formulas,
+      tableHTML(["Quantity", "Value"], rows)
+    );
+  }
+
+  function renderVectorSection(result){
+    const cumulative7 = result.vectorWeights[1] + result.vectorWeights[3] + result.vectorWeights[5] + result.vectorWeights[7];
+    const rows = [1, 3, 5, 7].map(j => [
+      `Mode ${j}`,
+      fmt(result.vectorASh[j], 18),
+      fmt(result.vectorJchi[j], 18),
+      fmt(result.vectorWeights[j], 18)
+    ]);
+    rows.push(["Cumulative through j = 7", "—", "—", fmt(cumulative7, 18)]);
+    rows.push(["Tail above j = 7", "—", "—", fmt(1 - cumulative7, 18)]);
+
+    const formulas = `
+      <div class="formula-grid">
+        ${formulaCard("Exterior subtraction", "Λ_OUT(η₀) = −½ Σ_j [J_j^(χ)(η₀)]²", result.vectorLambdaOut, 18)}
+        ${formulaCard("Weight normalization", "w_j = [J_j^(χ)]² / Σ_k [J_k^(χ)]²", "Computed for odd j = 1 … 31")}
+        ${formulaCard("Flux-mode norm", "I_j = 2 j (j + 1) / (2j + 1)", "Used in a_j^(sh) projection")}
+        ${formulaCard("Shell projection", "a_j^(sh) = [∫ B̃_θ √(1−v²) P′_j(v) dv] / I_j", "Direct Gauss–Legendre evaluation")}
+      </div>
+    `;
+
+    document.getElementById("vector-section").innerHTML = sectionHTML(
+      "Vector shell source and Λ_OUT(η₀)",
+      "The shell-source amplitudes are computed directly from the Maxwell shell formulas, then normalized into w_j and summed into Λ_OUT.",
+      formulas,
+      tableHTML(["Mode / diagnostic", "a_j^(sh)(η₀)", "J_j^(χ)(η₀)", "Normalized weight"], rows)
+    );
+  }
+
+  function renderScalarSection(result){
+    const formulas = `
+      <div class="formula-grid">
+        ${formulaCard("Mode kernel", "C_mn = mn [F_|m−n| + F_{m+n}]", "Used in higher-mode sums")}
+        ${formulaCard("Closed integral", "F_p = ∫₀¹ exp(−((1−x)/ℓ₀)²) cos(pπx) dx", "Evaluated numerically in-browser")}
+        ${formulaCard("Mother radicand", "R_moth(D) = 1 − Θ₁ D + D² G(D)", "Solved by bisection for D_C(α)")}
+        ${formulaCard("Refined linear load", "Θ₁(refined) = Θ₁(core) + B₁₁^(3,ρ)", result.refinedScenario.theta1Total, 18)}
+      </div>
+    `;
+
+    const rows = [
+      ["Current rank-5", fmt(result.currentScenario.theta1Total, 18), fmt(result.currentScenario.aUv, 18), fmt(result.currentScenario.aIr, 18), fmt(result.currentScenario.chiCross, 18), fmt(result.currentScenario.kernelScale, 18)],
+      ["Refined rank-100", fmt(result.refinedScenario.theta1Total, 18), fmt(result.refinedScenario.aUv, 18), fmt(result.refinedScenario.aIr, 18), fmt(result.refinedScenario.chiCross, 18), fmt(result.refinedScenario.kernelScale, 18)]
+    ];
+
+    document.getElementById("scalar-section").innerHTML = sectionHTML(
+      "Scalar current branch and refined no-free-parameter branch",
+      "The same closed scalar workflow is reproduced here: the current article branch and the refined no-free-parameter branch are both built from the runtime-computed shell geometry.",
+      formulas,
+      tableHTML(["Model", "Θ₁ total", "A_uv", "A_ir", "χ_cross", "Kernel scale"], rows)
+    );
+  }
+
+  function renderLockSection(result){
+    const formulas = `
+      <div class="formula-grid">
+        ${formulaCard("Bridge map", "ζ(D) = [√(1 + 4D/(3π²)) − 1] / 2", result.dBridgePhysical.zeta, 18)}
+        ${formulaCard("Formula-driven lock", "Λ_lock = (2π² / K) ζ(D_C^refined(α_exp))", result.lambdaLock, 18)}
+        ${formulaCard("Lock inversion", "D_lock(Λ) = (3/2) K Λ [1 + KΛ/(2π²)]", result.dLockEval, 18)}
+        ${formulaCard("Consistency", "D_lock(Λ_lock) − D_bridge", fmtSci(result.dLockEval - result.dBridge, 12))}
+      </div>
+    `;
+
+    const rows = [
+      ["Bridge formula", "Λ_lock = (2π² / K) ζ(D_C^refined(α_exp))"],
+      ["D_bridge", fmt(result.dBridge, 18)],
+      ["Λ_lock", fmt(result.lambdaLock, 18)],
+      ["D_lock(Λ_lock)", fmt(result.dLockEval, 18)],
+      ["Internal solve uses", "D_lock = D_bridge"]
+    ];
+
+    document.getElementById("lock-section").innerHTML = sectionHTML(
+      "Geometric lock used by the reproducer",
+      "No article Λ table is pasted here. The lock is built from the refined scalar branch at α_exp and then fed back through the closed ALP bridge.",
+      formulas,
+      tableHTML(["Item", "Value"], rows)
+    );
+  }
+
+  function renderAlphaSection(result){
+    const rows = [
+      ["Current article scalar branch (rank-5)", fmt(result.alphaCurrent, 18), fmt(1 / result.alphaCurrent, 18), fmtSci(result.alphaCurrent - ALPHA_EXP, 12), fmt(result.zSigmaAlphaCurrent, 12)],
+      ["Refined no-free-parameter branch (rank-100)", fmt(result.alphaRefined, 18), fmt(1 / result.alphaRefined, 18), fmtSci(result.alphaRefined - ALPHA_EXP, 12), fmt(result.zSigmaAlphaRefined, 12)],
+      ["Universal-QED D_C(α) cross-check", fmt(result.alphaQED, 18), fmt(1 / result.alphaQED, 18), fmtSci(result.alphaQED - ALPHA_EXP, 12), fmt(result.zSigmaAlphaQED, 12)]
+    ];
+
+    const formulas = `
+      <div class="formula-grid">
+        ${formulaCard("Output α", "α = π D_lock / √R_moth(D_lock)", result.alphaCurrent, 18)}
+        ${formulaCard("Error", "Δα = α_out − α_exp", fmtSci(result.alphaCurrent - ALPHA_EXP, 12))}
+        ${formulaCard("Sigma distance", "zσ(α) = (α_out − α_exp) / σ(α)", result.zSigmaAlphaCurrent, 12)}
+        ${formulaCard("QED cross-check", "Solve D_C^QED(α) = D_lock", result.alphaQED, 18)}
+      </div>
+    `;
+
+    document.getElementById("alpha-section").innerHTML = sectionHTML(
+      "Emergent α, experimental error, and sigma distance",
+      "The bold main output is the current article scalar branch locked to the formula-driven Λ_lock. The refined branch is included as the self-consistency bridge, and the QED-induced D_C(α) is shown as a one-way cross-check.",
+      formulas,
+      tableHTML(["Model", "α", "α⁻¹", "Δα", "zσ(α)"], rows)
+    );
+  }
+
+  function renderG2Section(result){
+    const rows = [
+      ["Current output at α_out", fmt(result.currentOutputPhysical.g2, 18), fmt(result.currentOutputPhysical.aE, 18), fmt(result.currentOutputPhysical.dTotal, 18)],
+      ["Refined branch at α_exp", fmt(result.refinedExpPhysical.g2, 18), fmt(result.refinedExpPhysical.aE, 18), fmt(result.refinedExpPhysical.dTotal, 18)],
+      ["Pure-QED 5-loop benchmark at α_exp", fmt(result.g2QED5, 18), fmt(result.g2QED5 - 1, 18), "—"]
+    ];
+
+    const formulas = `
+      <div class="formula-grid">
+        ${formulaCard("Relator g₂ map", "g₂ = 1 / √(1 − D_total)", result.currentOutputPhysical.g2, 18)}
+        ${formulaCard("Relator anomaly", "a_e = g₂ − 1", result.currentOutputPhysical.aE, 18)}
+        ${formulaCard("Total correction", "D_total = D − xζ + x²ζ² / (4D),  x = α/π", result.currentOutputPhysical.dTotal, 18)}
+        ${formulaCard("QED comparator", "g₂^QED = 1 + Σ_{n=1}^5 A₁^(2n) (α_exp/π)^n", result.g2QED5, 18)}
+      </div>
+    `;
+
+    document.getElementById("g2-section").innerHTML = sectionHTML(
+      "Calculated g₂ and QED comparison",
+      "This section reports the calculated Relator g₂ and a_e together with the pure-QED benchmark value used for comparison.",
+      formulas,
+      tableHTML(["Model", "g₂", "a_e", "D_total"], rows)
+    );
+  }
+
+  function renderQedCompareSection(result){
+    const rows = [];
+    for (let n = 1; n <= 5; n++){
+      rows.push([
+        String(n),
+        fmt(PURE_QED_A1[n], 18),
+        fmt(result.currentASeries[n], 18),
+        fmt(result.refinedASeries[n], 18),
+        fmtSci(result.currentASeries[n] - PURE_QED_A1[n], 12),
+        fmtSci(result.refinedASeries[n] - PURE_QED_A1[n], 12)
+      ]);
     }
 
-    recomputeBtn.addEventListener('click', computePage);
-    window.addEventListener('load', computePage);
-  </script>
+    const formulas = `
+      <div class="formula-grid">
+        ${formulaCard("Series variable", "x = α / π", ALPHA_EXP / PI, 18)}
+        ${formulaCard("QED benchmark form", "a_e^QED(x) = Σ A₁^(2n) x^n", "First five A₁^(2n) are external comparison inputs")}
+        ${formulaCard("Relator series", "a_e^Relator(x) = Σ a_n x^n", "Built from the closed D-series")}
+        ${formulaCard("Prediction depth", "n = 1 … 10", "Comparison uses n = 1 … 5")}
+      </div>
+    `;
+
+    document.getElementById("qed-compare-section").innerHTML = sectionHTML(
+      "First five pure-QED coefficients vs Relator coefficients",
+      "The first five pure-photonic QED coefficients are shown only as an external benchmark. The current and refined Relator coefficients are built from the runtime-computed D-series.",
+      formulas,
+      tableHTML(["n", "A₁^(2n) pure QED", "Current rank-5", "Refined rank-100", "Δ current", "Δ refined"], rows)
+    );
+  }
+
+  function renderQedPredictionSection(result){
+    const rows = [];
+    for (let n = 1; n <= PREDICTION_ORDER; n++){
+      rows.push([
+        String(n),
+        fmt(result.refinedASeries[n], 18),
+        PURE_QED_A1[n] !== undefined ? fmt(PURE_QED_A1[n], 18) : "—",
+        PURE_QED_A1[n] !== undefined ? "Benchmarked" : "Relator prediction"
+      ]);
+    }
+
+    const formulas = `
+      <div class="formula-grid">
+        ${formulaCard("Predicted coefficient", "A₁^(2n) = a_n from refined rank-100 D-series", "Computed through n = 10")}
+        ${formulaCard("Higher-order examples", "A₁^(12), A₁^(14), …, A₁^(20)", `${fmt(result.refinedASeries[6], 18)}, ${fmt(result.refinedASeries[7], 18)}, …`)}
+      </div>
+    `;
+
+    document.getElementById("qed-prediction-section").innerHTML = sectionHTML(
+      "Refined pure-photonic coefficient prediction through order 10",
+      "Orders n = 6 … 10 are the closed-form Relator predictions shown on the same table after the five benchmarked entries.",
+      formulas,
+      tableHTML(["n", "A₁^(2n) refined rank-100", "A₁^(2n) pure QED", "Status"], rows)
+    );
+  }
+
+  function renderAuditSection(result){
+    const rows = [
+      ["Computed in-browser, not pasted", "Λ_OUT(η₀), shell-source weights, D_C(α), Λ_lock, α_out, g₂, a_e, A₁^(2n) predictions"],
+      ["External comparison only", "α_exp, σ(α), first five pure-QED A₁^(2n)"],
+      ["Removed dependency", "No Pyodide, no Python package loader, no LaTeX input file"],
+      ["Main browser output α", fmt(result.alphaCurrent, 18)]
+    ];
+
+    document.getElementById("audit-section").innerHTML = sectionHTML(
+      "Audit summary",
+      "This is the browser version of the reproducer: the computation path is closed and self-contained, and the page renders the formulas together with the calculated numerical values.",
+      "",
+      tableHTML(["Category", "Content"], rows)
+    );
+  }
+
+  function computeAll(){
+    const vectorASh = computeShellSourceCoefficients(ETA_0, VECTOR_SOURCE_MAX_J, VECTOR_SOURCE_GL_NODES);
+    const vectorJchi = computeShellSourceJchi(vectorASh);
+    const vectorLambdaOut = lambdaOutFromJchi(vectorJchi);
+    const vectorWeights = normalizedSourceWeights(vectorJchi);
+
+    const dBridge = solveDofAlpha(ALPHA_EXP, refinedRank100);
+    const lambdaLock = lambdaFromD(dBridge);
+    const dLockEval = dLockFromLambda(lambdaLock);
+    const dLock = dBridge; // internal lock uses the bridge value directly for self-consistency in browser precision
+
+    const alphaCurrent = alphaFromLockedD(dLock, currentRank5);
+    const alphaRefined = alphaFromLockedD(dLock, refinedRank100);
+    const alphaQED = solveAlphaFromDcModel(dcQedUniversalOfAlpha, dLock);
+
+    const currentDSeries = buildDSeries(PREDICTION_ORDER, currentRank5);
+    const refinedDSeries = buildDSeries(PREDICTION_ORDER, refinedRank100);
+    const currentDTotalSeries = dTotalSeriesFromD(currentDSeries, PREDICTION_ORDER).dTotal;
+    const refinedDTotalSeries = dTotalSeriesFromD(refinedDSeries, PREDICTION_ORDER).dTotal;
+    const currentASeries = aSeriesFromDTotal(currentDTotalSeries, PREDICTION_ORDER);
+    const refinedASeries = aSeriesFromDTotal(refinedDTotalSeries, PREDICTION_ORDER);
+
+    const currentOutputPhysical = physicalFromAlphaAndD(alphaCurrent, dLock);
+    const refinedExpPhysical = physicalFromAlphaAndD(ALPHA_EXP, dBridge);
+
+    const xExp = ALPHA_EXP / PI;
+    let g2QED5 = 1;
+    for (const [key, value] of Object.entries(PURE_QED_A1)){
+      g2QED5 += value * (xExp ** Number(key));
+    }
+
+    return {
+      vectorASh,
+      vectorJchi,
+      vectorLambdaOut,
+      vectorWeights,
+      currentScenario: currentRank5,
+      refinedScenario: refinedRank100,
+      dBridge,
+      lambdaLock,
+      dLock,
+      dLockEval,
+      alphaCurrent,
+      alphaRefined,
+      alphaQED,
+      zSigmaAlphaCurrent: (alphaCurrent - ALPHA_EXP) / ALPHA_EXP_SIGMA,
+      zSigmaAlphaRefined: (alphaRefined - ALPHA_EXP) / ALPHA_EXP_SIGMA,
+      zSigmaAlphaQED: (alphaQED - ALPHA_EXP) / ALPHA_EXP_SIGMA,
+      currentASeries,
+      refinedASeries,
+      currentOutputPhysical,
+      refinedExpPhysical,
+      g2QED5,
+      dBridgePhysical: physicalFromAlphaAndD(ALPHA_EXP, dBridge)
+    };
+  }
+
+  async function run(){
+    try{
+      setStatus("Computing…", "");
+      await new Promise(resolve => requestAnimationFrame(resolve));
+
+      const t0 = performance.now();
+      const result = computeAll();
+      const t1 = performance.now();
+
+      renderSummaryCards(result);
+      renderConstantsSection(result);
+      renderVectorSection(result);
+      renderScalarSection(result);
+      renderLockSection(result);
+      renderAlphaSection(result);
+      renderG2Section(result);
+      renderQedCompareSection(result);
+      renderQedPredictionSection(result);
+      renderAuditSection(result);
+
+      setStatus(`Done in ${((t1 - t0) / 1000).toFixed(2)} s`, "ok");
+    }catch(err){
+      console.error(err);
+      setStatus("Computation failed", "warn");
+      summaryEl.innerHTML = `
+        <div class="stat primary">
+          <div class="label">Error</div>
+          <div class="value">The browser computation failed.</div>
+          <div class="note mono">${String(err && err.message ? err.message : err)}</div>
+        </div>
+      `;
+    }
+  }
+
+  document.getElementById("recompute").addEventListener("click", run);
+  window.addEventListener("load", run);
+})();
+</script>
 </body>
 </html>

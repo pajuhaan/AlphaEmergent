@@ -6,39 +6,21 @@
 
 Public code for the article **“Alpha — The Emergent Fine-Structure Constant”**.
 
-The repository computes the fine-structure constant from the geometric Alpha--Lock.
+The repository computes the fine-structure constant from the geometric Alpha--Lock:
 
-```math
-D_C(\alpha)=\mathcal G_\Lambda(\Lambda_{\rm geom}),
-\qquad
-\mathcal G_\Lambda(\Lambda)=\frac{3}{2}K\Lambda\left(1+\frac{K\Lambda}{2\pi^2}\right).
-````
+$$D_C(\alpha)=\mathcal G_\Lambda(\Lambda_{\rm geom}),\qquad \mathcal G_\Lambda(\Lambda)=\frac{3}{2}K\Lambda\left(1+\frac{K\Lambda}{2\pi^2}\right).$$
 
-Equivalently, the lock is
+Equivalently, the lock is expressed through
 
-```math
-C_{\log}
-=
-\frac{\pi^2}{D_C}\,\zeta(1+\zeta)
-=
-\frac{1}{3},
-\qquad
-\zeta=\frac{K\Lambda}{2\pi^2}.
-```
+$$C_{\log}=\frac{\pi^2}{D_C}\,\zeta(1+\zeta)=\frac{1}{3},\qquad \zeta=\frac{K\Lambda}{2\pi^2}.$$
 
 Representative output:
 
-```math
-\alpha_{\rm em}\approx 0.0072973525645,
-\qquad
-\alpha_{\rm em}^{-1}\approx 137.03599917.
-```
+$$\alpha_{\rm em}\approx 0.0072973525645,\qquad \alpha_{\rm em}^{-1}\approx 137.03599917.$$
 
 ## Links
 
-* **Repository:** [https://github.com/pajuhaan/AlphaEmergent](https://github.com/pajuhaan/AlphaEmergent)
-* **Live page:** [https://pajuhaan.github.io/AlphaEmergent/](https://pajuhaan.github.io/AlphaEmergent/)
-* **DOI:** [https://doi.org/10.5281/zenodo.16944532](https://doi.org/10.5281/zenodo.16944532)
-* **ResearchGate:** [https://www.researchgate.net/publication/396352740_Alpha_-_Emergent_The_Fine-Structure_Constant](https://www.researchgate.net/publication/396352740_Alpha_-_Emergent_The_Fine-Structure_Constant)
-
-
+- **Repository:** https://github.com/pajuhaan/AlphaEmergent
+- **Live page:** https://pajuhaan.github.io/AlphaEmergent/
+- **Article DOI:** https://doi.org/10.5281/zenodo.16944532
+- **ResearchGate:** https://www.researchgate.net/publication/396352740_Alpha_-_Emergent_The_Fine-Structure_Constant
