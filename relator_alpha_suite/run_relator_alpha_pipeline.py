@@ -19,12 +19,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "Run the full Relator-alpha pipeline and print the numerical tables "
-            "of the article in publication order."
+            "of the article in publication order, including intermediate values."
         )
     )
     parser.add_argument("--digits", type=int, default=24, help="Displayed significant digits.")
     parser.add_argument("--dps", type=int, default=160, help="Working precision in decimal digits.")
-    parser.add_argument("--width", type=int, default=220, help="Console width used for Rich tables.")
+    parser.add_argument("--width", type=int, default=300, help="Console width used for Rich tables.")
     return parser
 
 
@@ -37,14 +37,15 @@ def main() -> None:
     console.print("[bold]Relator Alpha Suite[/bold]")
     console.print(
         "Default pipeline mode: compute and print the article-style numerical tables, "
-        "including scalar, vector, α-lock, pure-photonic g₂, and appendix diagnostics."
+        "including intermediate values such as K, ALP-lock pieces, scalar N(D)/Q(D), "
+        "QED-induced coefficients, bridge terms, and appendix sensitivities."
     )
     console.print()
     print_article_tables(console, all_article_tables(digits=args.digits))
     console.print()
     console.print(
         "[bold green]Done.[/bold green] "
-        "All default article tables were evaluated without terminal-side number truncation."
+        "All default article tables and their intermediate diagnostics were evaluated."
     )
 
 

@@ -16,7 +16,7 @@ from relator_alpha.article_constants import LAMBDA_GEOM_MEAN, SCALAR_MODEL_PRESE
 from relator_alpha.alp import solve_alpha_from_article_branch
 from relator_alpha.common import configure_precision, format_mpf
 from relator_alpha.presentation import build_console
-from relator_alpha.scalar_article import solve_dc_article
+from relator_alpha.scalar_article import dynamic_denominator, dynamic_numerator, solve_dc_article
 
 
 
@@ -44,7 +44,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--digits", type=int, default=24)
     parser.add_argument("--dps", type=int, default=160)
-    parser.add_argument("--width", type=int, default=200)
+    parser.add_argument("--width", type=int, default=280)
     return parser
 
 
@@ -64,6 +64,9 @@ def main() -> None:
         alpha_source = "user-supplied α"
 
     result = solve_dc_article(alpha_value, model)
+    numerator = dynamic_numerator(result.d_c, model)
+    denominator = dynamic_denominator(result.d_c, model)
+    sqrt_r = mp.sqrt(result.radicand)
 
     parameter_table = Table(title=f"Article scalar preset: {model.key}")
     parameter_table.add_column("Parameter")
@@ -87,9 +90,13 @@ def main() -> None:
     result_table.add_row("α", format_mpf(result.alpha, args.digits), alpha_source)
     result_table.add_row("x = α/π", format_mpf(result.x, args.digits), "Sommerfeld variable")
     result_table.add_row("D_C(α)", format_mpf(result.d_c, args.digits), "physical positive branch")
+    result_table.add_row("N(D_C)", format_mpf(numerator, args.digits), "dynamic numerator")
+    result_table.add_row("Q(D_C)", format_mpf(denominator, args.digits), "dynamic denominator")
     result_table.add_row("Φ_dyn(D_C)", format_mpf(result.phi_dyn, args.digits), "visible dynamic response")
     result_table.add_row("R_moth(D_C)", format_mpf(result.radicand, args.digits), "scalar mother radicand")
-    result_table.add_row("closure residual", format_mpf(result.residual, args.digits), "D_C - x sqrt(R_moth)")
+    result_table.add_row("√R_moth(D_C)", format_mpf(sqrt_r, args.digits), "principal square root")
+    result_table.add_row("x √R_moth(D_C)", format_mpf(result.x * sqrt_r, args.digits), "closure right-hand side")
+    result_table.add_row("closure residual", format_mpf(result.residual, args.digits), "D_C - x √R_moth")
 
     console.print(parameter_table)
     console.print()

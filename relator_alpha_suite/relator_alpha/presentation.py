@@ -24,8 +24,8 @@ class ArticleTable:
     note: str | None = None
 
 
-def build_console(width: int = 220) -> Console:
-    """Build a wide console to prevent terminal-side ellipsis of scientific notation."""
+def build_console(width: int = 300) -> Console:
+    """Build a wide console to reduce terminal-side clipping of long numerals."""
     return Console(width=width, highlight=False)
 
 
