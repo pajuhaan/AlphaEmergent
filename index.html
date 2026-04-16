@@ -14,7 +14,7 @@ window.MathJax = {
   startup: { typeset: false }
 };
 </script>
-<script defer id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+<script defer id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <style>
   :root{
     --bg:#f6f7fb;
@@ -2241,7 +2241,20 @@ window.MathJax = {
   }
 
   async function typesetRenderedMath(){
-    if (typeof window === 'undefined' || !window.MathJax || !MathJax.typesetPromise) return;
+    if (typeof window === 'undefined') return;
+    const script = document.getElementById('MathJax-script');
+    if ((!window.MathJax || !window.MathJax.typesetPromise) && script){
+      await new Promise(resolve => {
+        if (window.MathJax && window.MathJax.typesetPromise) return resolve();
+        script.addEventListener('load', () => resolve(), { once: true });
+        script.addEventListener('error', () => resolve(), { once: true });
+        setTimeout(resolve, 2500);
+      });
+    }
+    if (!window.MathJax || !MathJax.typesetPromise){
+      console.warn('MathJax unavailable: rendering continues without TeX typesetting.');
+      return;
+    }
     try{
       if (MathJax.startup && MathJax.startup.promise) await MathJax.startup.promise;
       const nodes = [dom.hero, dom.heroNote, dom.keyPanel, ...Object.values(dom.sections)].filter(Boolean);
